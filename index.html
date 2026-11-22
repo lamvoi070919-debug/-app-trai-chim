@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Quản Lý Trại Chim</title>
-    <!-- Nhúng thư viện biểu đồ Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2e7d32; --bg: #f4f7f6; --card: #ffffff; --text: #333; }
@@ -12,7 +11,7 @@
         .container { max-width: 1200px; margin: auto; }
         
         /* Dashboard */
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .stat-card { background: var(--card); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; border-top: 4px solid var(--primary); }
         .stat-card h3 { margin: 0; font-size: 13px; color: #666; }
         .stat-card p { margin: 10px 0 0 0; font-size: 22px; font-weight: bold; color: var(--primary); }
@@ -40,7 +39,7 @@
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-size: 13px; }
         th { background: #e8f5e9; color: var(--primary); font-weight: bold; }
         tr:hover { background: #f1f8e9; }
-        .badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; }
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; display: inline-block; margin-bottom: 2px;}
         .bg-green { background: #4caf50; } .bg-red { background: #f44336; } .bg-yellow { background: #ffc107; color: #333; } .bg-blue { background: #2196f3; }
         
         /* Nút hành động trong bảng */
@@ -56,6 +55,7 @@
 
     <!-- THỐNG KÊ -->
     <div class="dashboard">
+        <div class="stat-card" style="border-top-color: #009688;"><h3>Ô Đang Hoạt Động</h3><p id="totalActiveBoxes" style="color: #009688;">0</p></div>
         <div class="stat-card" style="border-top-color: #673ab7;"><h3>Tổng Số Chim Trong Trại</h3><p id="totalBirds" style="color: #673ab7;">0</p></div>
         <div class="stat-card"><h3>Tổng Trứng Đã Đẻ</h3><p id="totalEggs">0</p></div>
         <div class="stat-card" style="border-top-color: #f44336;"><h3>Tổng Chim Chết</h3><p id="totalDead" style="color: #f44336;">0</p></div>
@@ -67,7 +67,6 @@
     <!-- FORM NHẬP LIỆU -->
     <div class="form-section">
         <h3 class="section-title" id="formTitle">➕ Thêm Thông Tin Ô Mới</h3>
-        <!-- Lưu ID ẩn để biết đang Sửa hay Thêm mới -->
         <input type="hidden" id="editId" value="">
         
         <div class="grid-3">
@@ -84,6 +83,7 @@
                     <option value="Cần cho uống thuốc">Cần cho uống thuốc</option>
                     <option value="Chết con trống">Chết con trống</option>
                     <option value="Chết con mái">Chết con mái</option>
+                    <option value="Chết cả 2">Chết cả 2 (Bỏ trống)</option>
                 </select>
             </div>
             <div class="form-group">
@@ -117,9 +117,12 @@
 
         <div class="grid-3">
             <div class="form-group">
-                <label>Trạng thái Tổ Ấp:</label>
+                <label>Trạng thái Tổ:</label>
                 <select id="nestStatus">
                     <option value="Chưa ấp">Chưa ấp / Chờ đẻ</option>
+                    <option value="Đang ấp">Đang ấp</option>
+                    <option value="Ngày ấp">Ngày ấp</option>
+                    <option value="Vừa ấp vừa nuôi con">Vừa ấp vừa nuôi con</option>
                     <option value="1-5 ngày">Tổ ghép 1-5 ngày</option>
                     <option value="6-10 ngày">Tổ ghép 6-10 ngày</option>
                     <option value="11-20 ngày">Tổ ghép 11-20 ngày</option>
@@ -203,7 +206,7 @@
                     <th>Số Ô</th>
                     <th>Trạng Thái Bố Mẹ</th>
                     <th>Ngày Ghép / Đẻ / Nở</th>
-                    <th>Tổ Ấp</th>
+                    <th>Trạng Thái Tổ</th>
                     <th>Trứng (Tổng / Sự cố)</th>
                     <th>Chim Chết</th>
                     <th>Xuất Bán</th>
@@ -226,7 +229,6 @@
         return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
     }
 
-    // Hàm Lưu (Thêm mới hoặc Cập nhật)
     function saveData() {
         const boxNumber = document.getElementById('boxNumber').value;
         if (!boxNumber) {
@@ -237,7 +239,7 @@
         const editId = document.getElementById('editId').value;
 
         const newRecord = {
-            id: editId ? parseInt(editId) : Date.now(), // Nếu có ID là đang sửa, không thì tạo ID mới
+            id: editId ? parseInt(editId) : Date.now(),
             boxNumber: parseInt(boxNumber),
             parentStatus: document.getElementById('parentStatus').value,
             parentingRating: document.getElementById('parentingRating').value,
@@ -259,12 +261,10 @@
         };
 
         if (editId) {
-            // Chế độ Sửa: Tìm và thay thế
             const index = records.findIndex(r => r.id === parseInt(editId));
             if (index !== -1) records[index] = newRecord;
             alert(`Đã cập nhật thông tin ô ${boxNumber}!`);
         } else {
-            // Chế độ Thêm mới
             records.push(newRecord);
             alert(`Đã thêm mới ô ${boxNumber}!`);
         }
@@ -274,7 +274,6 @@
         renderAll(); 
     }
 
-    // Hàm Đưa dữ liệu lên Form để Sửa
     function editRecord(id) {
         const record = records.find(r => r.id === id);
         if (!record) return;
@@ -299,13 +298,12 @@
         document.getElementById('soldCount').value = record.soldCount;
         document.getElementById('notes').value = record.notes;
 
-        // Đổi giao diện Form sang chế độ Sửa
         document.getElementById('formTitle').innerText = "✏️ Chỉnh Sửa Thông Tin Ô " + record.boxNumber;
         document.getElementById('btnSave').innerText = "💾 CẬP NHẬT THAY ĐỔI";
-        document.getElementById('btnSave').style.background = "#2196f3"; // Đổi màu xanh dương
-        document.getElementById('btnCancel').style.display = "block"; // Hiện nút Hủy
+        document.getElementById('btnSave').style.background = "#2196f3";
+        document.getElementById('btnCancel').style.display = "block";
 
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Cuộn lên đầu trang
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function deleteRecord(id) {
@@ -316,7 +314,6 @@
         }
     }
 
-    // Reset form về trạng thái Thêm mới
     function resetForm() {
         document.querySelectorAll('input').forEach(input => input.value = '');
         document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
@@ -325,8 +322,8 @@
         document.getElementById('editId').value = "";
         document.getElementById('formTitle').innerText = "➕ Thêm Thông Tin Ô Mới";
         document.getElementById('btnSave').innerText = "💾 LƯU THÔNG TIN";
-        document.getElementById('btnSave').style.background = "var(--primary)"; // Trả lại màu xanh lá
-        document.getElementById('btnCancel').style.display = "none"; // Ẩn nút Hủy
+        document.getElementById('btnSave').style.background = "var(--primary)";
+        document.getElementById('btnCancel').style.display = "none";
     }
 
     function renderTable() {
@@ -338,7 +335,6 @@
             return;
         }
 
-        // SẮP XẾP DỮ LIỆU THEO SỐ Ô TĂNG DẦN
         const sortedRecords = [...records].sort((a, b) => a.boxNumber - b.boxNumber);
 
         sortedRecords.forEach(r => {
@@ -353,7 +349,7 @@
                 <td style="font-size: 12px;">
                     Ghép: ${formatDate(r.pairingDate)}<br>
                     Đẻ: ${formatDate(r.layDate)}<br>
-                    Nở: ${formatDate(r.hatchDate)}
+                    Nở/Ấp: ${formatDate(r.hatchDate)}
                 </td>
                 <td>
                     <span class="badge ${nestBadge}">${r.nestStatus}</span><br>
@@ -385,23 +381,29 @@
     }
 
     function renderStatsAndChart() {
-        let totalBirds = 0, totalEggs = 0, totalDead = 0, totalIncubating = 0;
+        let totalActiveBoxes = 0, totalBirds = 0, totalEggs = 0, totalDead = 0, totalIncubating = 0;
         let chartData = {}; 
 
         records.forEach(r => {
-            // Tổng số chim trong trại = Số bố mẹ (2 con/ô) + Số con ghép/tổ + Số đang ấp (nếu có)
-            // Ước tính đơn giản: Cứ 1 ô có Bố Mẹ bình thường thì +2 con. Bạn có thể sửa lại công thức nếu muốn.
+            // 1. Tính tổng số ô đang hoạt động (Loại trừ ô bị chết cả 2 hoặc ô trống)
+            if (r.parentStatus !== 'Chết cả 2') {
+                totalActiveBoxes++;
+            }
+
+            // 2. Ước tính tổng số chim trong trại
             if(!r.parentStatus.includes('Chết')) totalBirds += 2; 
             totalBirds += (r.pairedBirds || 0); 
 
             totalEggs += (r.eggCount || 0);
             totalDead += (r.deadBirdCount || 0);
             
-            // Đếm số tổ đang ấp
-            if (['1-5 ngày', '6-10 ngày', '11-20 ngày', '20-25 ngày'].includes(r.nestStatus)) {
+            // 3. Đếm số tổ đang ấp (Cập nhật theo các trạng thái mới)
+            const incubatingStatuses = ['Đang ấp', 'Ngày ấp', 'Vừa ấp vừa nuôi con', '1-5 ngày', '6-10 ngày', '11-20 ngày', '20-25 ngày'];
+            if (incubatingStatuses.includes(r.nestStatus)) {
                 totalIncubating += (r.nestCount || 1);
             }
 
+            // 4. Dữ liệu biểu đồ
             if (r.layDate) {
                 const date = new Date(r.layDate);
                 const monthYear = `${date.getMonth()+1}/${date.getFullYear()}`;
@@ -411,6 +413,7 @@
             }
         });
 
+        document.getElementById('totalActiveBoxes').innerText = totalActiveBoxes;
         document.getElementById('totalBirds').innerText = totalBirds;
         document.getElementById('totalEggs').innerText = totalEggs;
         document.getElementById('totalDead').innerText = totalDead;
