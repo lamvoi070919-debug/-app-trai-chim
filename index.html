@@ -157,12 +157,22 @@
 </div>
 
 <script>
-    let records = JSON.parse(localStorage.getItem('birdFarmData')) || [];
+    // Sửa lỗi khởi tạo mảng nếu dữ liệu cũ bị lỗi
+    let rawData = localStorage.getItem('birdFarmData');
+    let records = [];
+    try {
+        records = rawData ? JSON.parse(rawData) : [];
+        if (!Array.isArray(records)) records = [];
+    } catch (e) {
+        records = [];
+    }
+
     let chartInstance = null;
 
     function formatDate(dateStr) {
         if(!dateStr) return "-";
         const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return "-";
         return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
     }
 
@@ -184,46 +194,55 @@
         }
     }
 
+    // HÀM LƯU ĐÃ ĐƯỢC SỬA LỖI TRIỆT ĐỂ
     function saveData() {
-        const boxNumber = document.getElementById('boxNumber').value;
-        if (!boxNumber) { alert("Vui lòng nhập Số Ô!"); return; }
+        const boxNumberInput = document.getElementById('boxNumber').value;
+        if (!boxNumberInput) { alert("Vui lòng nhập Số Ô trước khi lưu!"); return; }
 
         const editId = document.getElementById('editId').value;
+        
+        // Thu thập dữ liệu an toàn
         const newRecord = {
             id: editId ? parseInt(editId) : Date.now(),
-            boxNumber: parseInt(boxNumber),
-            parentStatus: document.getElementById('parentStatus').value,
-            parentingRating: document.getElementById('parentingRating').value,
-            birdStatus: document.getElementById('birdStatus').value,
-            pairingStatus: document.getElementById('pairingStatus').value,
-            pairingDate: document.getElementById('pairingDate').value,
+            boxNumber: parseInt(boxNumberInput),
+            parentStatus: document.getElementById('parentStatus').value || "Bình thường",
+            parentingRating: document.getElementById('parentingRating').value || "Chưa đánh giá",
+            birdStatus: document.getElementById('birdStatus').value || "Đang chờ đẻ",
+            pairingStatus: document.getElementById('pairingStatus').value || "Chưa ghép",
+            pairingDate: document.getElementById('pairingDate').value || "",
             nestCount: parseInt(document.getElementById('nestCount').value) || 0,
-            nestStatus: document.getElementById('nestStatus').value,
-            layDate: document.getElementById('layDate').value,
-            hatchDate: document.getElementById('hatchDate').value,
+            nestStatus: document.getElementById('nestStatus').value || "Chưa ấp",
+            layDate: document.getElementById('layDate').value || "",
+            hatchDate: document.getElementById('hatchDate').value || "",
             eggCount: parseInt(document.getElementById('eggCount').value) || 0,
-            eggIssues: document.getElementById('eggIssues').value,
+            eggIssues: document.getElementById('eggIssues').value || "",
             pairedBirds: parseInt(document.getElementById('pairedBirds').value) || 0,
-            pairNotes: document.getElementById('pairNotes').value,
+            pairNotes: document.getElementById('pairNotes').value || "",
             deadBirdCount: parseInt(document.getElementById('deadBirdCount').value) || 0,
-            deadDetails: document.getElementById('deadDetails').value,
-            deadReason: document.getElementById('deadReason').value,
-            soldDate: document.getElementById('soldDate').value,
+            deadDetails: document.getElementById('deadDetails').value || "",
+            deadReason: document.getElementById('deadReason').value || "Không có",
+            soldDate: document.getElementById('soldDate').value || "",
             soldCount: parseInt(document.getElementById('soldCount').value) || 0,
-            notes: document.getElementById('notes').value
+            notes: document.getElementById('notes').value || ""
         };
 
         if (editId) {
             const index = records.findIndex(r => r.id === parseInt(editId));
             if (index !== -1) records[index] = newRecord;
-            alert(`Đã cập nhật ô ${boxNumber}!`);
+            alert(`Đã cập nhật ô ${newRecord.boxNumber} thành công!`);
         } else {
             records.push(newRecord);
-            alert(`Đã thêm mới ô ${boxNumber}!`);
+            alert(`Đã thêm mới ô ${newRecord.boxNumber} thành công!`);
         }
 
-        localStorage.setItem('birdFarmData', JSON.stringify(records)); 
-        resetForm(); renderAll(); closeDetail(); 
+        try {
+            localStorage.setItem('birdFarmData', JSON.stringify(records)); 
+            resetForm(); 
+            renderAll(); 
+            closeDetail();
+        } catch (error) {
+            alert("Lỗi khi lưu vào bộ nhớ trình duyệt: " + error.message);
+        }
     }
 
     function editRecord(id) {
@@ -250,14 +269,14 @@
         document.getElementById('soldCount').value = record.soldCount;
         document.getElementById('notes').value = record.notes;
         document.getElementById('formTitle').innerText = "✏️ Chỉnh Sửa Ô " + record.boxNumber;
-        document.getElementById('btnSave').innerText = "💾 CẬP NHẬT";
+        document.getElementById('btnSave').innerText = "💾 CẬP NHẬT THAY ĐỔI";
         document.getElementById('btnSave').style.background = "#2196f3";
         document.getElementById('btnCancel').style.display = "block";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function deleteRecord(id) {
-        if (confirm("Xóa thông tin ô này?")) {
+        if (confirm("Bạn có chắc chắn muốn xóa thông tin ô này?")) {
             records = records.filter(r => r.id !== id);
             localStorage.setItem('birdFarmData', JSON.stringify(records));
             renderAll(); closeDetail();
@@ -279,8 +298,12 @@
     }
 
     function renderTable() {
-        const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
-        if (records.length === 0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Chưa có dữ liệu.</td></tr>'; return; }
+        const tbody = document.getElementById('tableBody'); 
+        tbody.innerHTML = '';
+        if (records.length === 0) { 
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Chưa có dữ liệu.</td></tr>'; 
+            return; 
+        }
         const sortedRecords = [...records].sort((a, b) => a.boxNumber - b.boxNumber);
 
         sortedRecords.forEach(r => {
@@ -288,7 +311,7 @@
             let badgeClass = r.parentStatus.includes('bệnh') || r.parentStatus.includes('Chết') ? 'bg-red' : 'bg-green';
             let nestBadge = r.nestStatus.includes('25-35') ? 'bg-blue' : (r.nestStatus === 'Chưa ấp' ? 'bg-yellow' : 'bg-green');
             let birdStatusHtml = r.birdStatus ? `<span class="badge bg-blue">${r.birdStatus}</span>` : '-';
-            let pairDateHtml = r.hatchDate ? (() => { const h = new Date(r.hatchDate); h.setDate(h.getDate() + 20); return `<br><span style="color:#2196f3; font-size:11px;">Ghép: ${formatDate(h)}</span>`; })() : "";
+            let pairDateHtml = r.hatchDate ? (() => { const h = new Date(r.hatchDate); if(isNaN(h.getTime())) return ""; h.setDate(h.getDate() + 20); return `<br><span style="color:#2196f3; font-size:11px;">Ghép: ${formatDate(h)}</span>`; })() : "";
 
             tr.innerHTML = `
                 <td><strong>${r.boxNumber}</strong></td>
@@ -322,10 +345,12 @@
 
             if (r.layDate) {
                 const date = new Date(r.layDate);
-                const monthYear = `${date.getMonth()+1}/${date.getFullYear()}`;
-                if (!chartData[monthYear]) chartData[monthYear] = { eggs: 0, dead: 0 };
-                chartData[monthYear].eggs += r.eggCount;
-                chartData[monthYear].dead += r.deadBirdCount;
+                if (!isNaN(date.getTime())) {
+                    const monthYear = `${date.getMonth()+1}/${date.getFullYear()}`;
+                    if (!chartData[monthYear]) chartData[monthYear] = { eggs: 0, dead: 0 };
+                    chartData[monthYear].eggs += (r.eggCount || 0);
+                    chartData[monthYear].dead += (r.deadBirdCount || 0);
+                }
             }
         });
 
@@ -386,6 +411,8 @@
     function closeDetail() { document.getElementById('filterResultBox').style.display = "none"; }
 
     function renderAll() { renderTable(); renderStatsAndChart(); }
+    
+    // Khởi chạy lần đầu
     renderAll();
 </script>
 </body>
