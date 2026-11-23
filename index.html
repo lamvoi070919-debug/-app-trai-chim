@@ -1,243 +1,191 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Quản Lý Trại Chim</title>
-<style>
-:root{--primary:#2e7d32;--bg:#f4f7f6;--card:#fff;--text:#333}
-*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);margin:0;padding:10px;color:var(--text);font-size:14px}
-.container{max-width:1100px;margin:auto}.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:8px;margin-bottom:15px}
-.stat-card,.form-section,.table-section{background:var(--card);padding:10px;border-radius:8px;box-shadow:0 2px 5px #00000012;margin-bottom:15px}
-.stat-card{text-align:center;border-top:4px solid var(--primary)}.stat-card h3{margin:0;font-size:11px;color:#666}.stat-card p{margin:5px 0 0;font-size:18px;font-weight:bold;color:var(--primary)}
-.section-title{font-size:15px;color:var(--primary);border-bottom:2px solid var(--primary);padding-bottom:5px;margin:0 0 10px}
-.sub-title{font-size:13px;border-bottom:1px dashed #ccc;margin:12px 0 8px;font-weight:bold}
-.grid-2,.grid-3{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.form-group{margin-bottom:8px}label{display:block;font-weight:600;margin-bottom:3px;font-size:12px;color:#555}
-input,select,textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:5px;font:inherit;font-size:13px;min-width:0}
-button{border:0;padding:10px;font-size:14px;border-radius:5px;cursor:pointer;font-weight:bold}.btn-group{display:flex;gap:10px;margin-top:15px}.btn-group button{flex:1}.btn-save{background:var(--primary);color:white}.btn-reset{background:#9e9e9e;color:white}
-.table-section{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:7px;text-align:left;border-bottom:1px solid #ddd;font-size:12px;vertical-align:top}th{background:#e8f5e9;color:var(--primary)}.badge{padding:2px 5px;border-radius:8px;font-size:10px;font-weight:bold;color:white;display:inline-block;margin:2px 2px 2px 0}.bg-green{background:#4caf50}.bg-red{background:#f44336}.bg-yellow{background:#ffc107;color:#333}.bg-blue{background:#2196f3}.bg-orange{background:#ff9800}.bg-gray{background:#9e9e9e}
-.action-btns{display:flex;gap:4px}.btn-edit{background:#ffc107;color:#333;padding:5px;font-size:11px}.btn-delete{background:#ff5252;color:white;padding:5px;font-size:11px}
-.history-list{list-style:none;padding:0;margin:0}.history-list li{padding:6px;border-bottom:1px dashed #ccc;font-size:13px}.hatch-schedule-table th{background:#d84315;color:white}.highlight-today{background:#ffebee;color:#c62828;font-weight:bold}.highlight-upcoming{background:#e8f5e9;color:#2e7d32;font-weight:bold}
-.modal{display:none;position:fixed;z-index:1000;inset:0;background:#0008}.modal-content{background:white;margin:15vh auto;padding:20px;border-radius:8px;width:88%;max-width:400px;position:relative;max-height:70vh;overflow:auto}.close{float:right;font-size:25px;color:#888}
-#loginPanel{max-width:430px;margin:10vh auto;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 12px #0002}#app{display:none}.statusline{font-size:12px;color:#555;margin:8px 0}.topline{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.smallbtn{background:#eee;color:#333;padding:7px 10px;font-size:12px}
-@media(max-width:520px){.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard{grid-template-columns:repeat(3,minmax(0,1fr))}.form-section{padding:11px}}
-</style>
-</head>
-<body>
-<section id="loginPanel">
-<h2 style="color:#2e7d32;margin-top:0">🐦 QUẢN LÝ TRẠI CHIM</h2>
-<p>Đăng nhập để đồng bộ dữ liệu riêng tư của bạn lên Firebase.</p>
-<div class="form-group"><label>Email đã đăng ký Firebase</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Nhập email"></div>
-<div class="form-group"><label>Mật khẩu</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu"></div>
-<button id="loginBtn" class="btn-save" style="width:100%" onclick="login()">ĐĂNG NHẬP</button>
-<p id="loginMessage" class="statusline">Dùng email và mật khẩu bạn đã tạo trong Firebase Authentication.</p>
-</section>
-
-<div id="app" class="container">
-<div class="topline"><h2 style="text-align:center;color:var(--primary);margin:5px 0 10px">🐦 QUẢN LÝ TRẠI CHIM</h2><button class="smallbtn" onclick="logout()">Đăng xuất</button></div>
-<div id="syncStatus" class="statusline">Đang kết nối...</div>
-<div class="dashboard">
-<div class="stat-card" style="border-color:#009688"><h3>Tổng Ô</h3><p id="totalBoxes">0</p></div>
-<div class="stat-card" style="border-color:#673ab7"><h3>Hoạt Động</h3><p id="totalActive">0</p></div>
-<div class="stat-card" style="border-color:#ff9800"><h3>Chờ Đẻ</h3><p id="totalWaiting">0</p></div>
-<div class="stat-card" style="border-color:#2196f3"><h3>Đang Ấp</h3><p id="totalIncubating">0</p></div>
-<div class="stat-card" style="border-color:#9e9e9e"><h3>Ô Trống</h3><p id="totalEmpty">0</p></div>
-<div class="stat-card" style="border-color:#f44336"><h3>Chết Tháng</h3><p id="totalDeadMonth">0</p></div>
-<div class="stat-card" style="border-color:#4caf50"><h3>Bán Tháng</h3><p id="totalSoldMonth">0</p></div>
-</div>
-
-<div class="form-section">
-<h3 class="section-title" id="formTitle">➕ Thêm Thông Tin Ô Mới</h3><input type="hidden" id="editId">
-<div class="grid-3">
-<div class="form-group"><label>Số Ô</label><input type="number" id="boxNumber" placeholder="VD: 101"></div>
-<div class="form-group"><label>Trạng Thái Ô</label><select id="boxStatus"><option>Đang hoạt động</option><option>Chờ đẻ</option><option>Đang ấp/Nuôi con</option><option>Ô trống</option></select></div>
-<div class="form-group"><label>Tình Trạng Bố Mẹ</label><select id="parentStatus"><option>Bình thường</option><option>Chết bố</option><option>Chết mẹ</option><option>Bệnh (Cần lưu ý)</option></select></div>
-</div>
-<div class="grid-3">
-<div class="form-group"><label>Đánh Giá Nuôi Con</label><select id="parentingRating"><option>Chưa đánh giá</option><option>Đạt</option><option>Không đạt</option></select></div>
-<div class="form-group"><label>Ngày Ghép Con</label><input type="date" id="pairingDate" onchange="calcDates()"></div>
-<div class="form-group"><label>Số Con Ghép</label><input type="number" id="pairedBirds" placeholder="Số con" oninput="calcDates()"></div>
-</div>
-<div class="sub-title" style="color:#d32f2f">🥚 Ấp Trứng & Theo Dõi Tổ Ấp</div>
-<div class="grid-3" style="background:#fff3e0;padding:7px;border-radius:6px">
-<div class="form-group"><label>Ngày Đẻ Quả Thứ 2</label><input type="date" id="layDate" onchange="calcHatchDate()"></div>
-<div class="form-group"><label>Ngày Bắt Đầu Ấp</label><input type="date" id="incubateDate"></div>
-<div class="form-group"><label>Số Tổ Đang Ấp</label><input type="number" id="incubateCount" value="1"></div>
-</div>
-<div class="grid-3">
-<div class="form-group"><label>Ngày Ghép Con (+16 ngày)</label><input id="hatchDateDisplay" readonly></div>
-<div class="form-group"><label>Ngày Nở (+18 ngày)</label><input id="nởDateDisplay" readonly></div>
-<div class="form-group"><label>Trạng Thái Trứng</label><select id="eggStatus"><option>Bình thường</option><option>Trứng trắng</option><option>Không phôi</option><option>Phôi chết lưu</option></select></div>
-</div>
-<div class="grid-2">
-<div class="form-group"><label>Tổng Số Trứng Đẻ</label><input type="number" id="eggCount" placeholder="Số quả"></div>
-<div class="form-group" style="display:flex;align-items:flex-end"><button type="button" onclick="addEggHistory()" style="background:#ff9800;color:white;width:100%">+ Lưu lịch sử đẻ</button></div>
-</div>
-<ul id="eggHistoryList" class="history-list"></ul>
-<div class="sub-title" style="color:#2e7d32">💰 Dự Kiến Xuất Bán & Đẻ Lại</div>
-<div class="grid-3" style="background:#e8f5e9;padding:7px;border-radius:6px">
-<div class="form-group"><label>Ngày Bán DK (+28 ngày)</label><input id="soldDateDisplay" readonly></div>
-<div class="form-group"><label>Ngày Đẻ Lại (+45 ngày)</label><input id="relayLayDateDisplay" readonly></div>
-<div class="form-group"><label>Đếm Ngược Đẻ Lại</label><input id="relayCountdown" readonly></div>
-</div>
-<div class="grid-2">
-<div class="form-group"><label>Số Con Dự Kiến Bán</label><input type="number" id="soldCount"></div>
-<div class="form-group"><label>Ngày Bán Thực Tế</label><input type="date" id="actualSoldDate"></div>
-</div>
-<div class="sub-title" style="color:#1976d2">🔄 Theo Dõi Chuyển Tổ</div>
-<div class="grid-3" style="background:#e3f2fd;padding:7px;border-radius:6px">
-<div class="form-group"><label>Tổ Đi (Số Ô)</label><input id="transferFrom" placeholder="VD: 101"></div>
-<div class="form-group"><label>Tổ Đến (Số Ô)</label><input id="transferTo" placeholder="VD: 102"></div>
-<div class="form-group"><label>Ngày Chuyển</label><input type="date" id="transferDate"></div>
-</div>
-<div class="sub-title" style="color:#c62828">💀 Theo Dõi Chim Chết</div>
-<div class="grid-3" style="background:#ffebee;padding:7px;border-radius:6px">
-<div class="form-group"><label>Ngày Chết</label><input type="date" id="deadDate"></div>
-<div class="form-group"><label>Tuổi Chim Chết</label><input id="deadAge" placeholder="VD: 3 ngày tuổi"></div>
-<div class="form-group"><label>Số Lượng Chết</label><input type="number" id="deadCount"></div>
-</div>
-<div class="form-group"><label>Lý Do Chết / Ghi Chú</label><textarea id="notes" rows="2"></textarea></div>
-<div class="btn-group"><button class="btn-save" onclick="saveData()" id="btnSave">💾 LƯU THÔNG TIN</button><button class="btn-reset" onclick="resetForm()">🔄 LÀM MỚI</button></div>
-</div>
-
-<div class="table-section"><h3 class="section-title">📋 Bảng Tổng Hợp Trại</h3><table><thead><tr><th>Số Ô</th><th>Trạng Thái / Bố Mẹ</th><th>Lịch Sử Đẻ</th><th>Ấp Trứng / Tổ Ấp</th><th>Ghép Con & Bán</th><th>Dự Kiến Đẻ Lại</th><th>Chuyển Tổ</th><th>Chết</th><th>Hành Động</th></tr></thead><tbody id="tableBody"></tbody></table></div>
-<div class="table-section"><h3 class="section-title" style="color:#d84315;border-color:#d84315">⏰ Lịch Nhắc Ghép Con (Quả thứ 2 + 16 ngày)</h3><p style="font-size:12px;color:#666">Ngày đỏ là hôm nay, ngày xanh là sắp tới.</p><table class="hatch-schedule-table"><thead><tr><th>Ngày Cần Ghép Con</th><th>Số Tổ Cần Ghép</th><th>Chi Tiết Các Ô</th></tr></thead><tbody id="hatchTableBody"></tbody></table></div>
-</div>
-
-<div id="historyModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h3 id="modalTitle" style="color:var(--primary)">Chi tiết</h3><ul id="modalList" class="history-list"></ul></div></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
- apiKey: "AIzaSyAE7M7khd-exDyS9FFIhJOiqTQxtB9inxI",
- authDomain: "trai-chim-cua-toi.firebaseapp.com",
- projectId: "trai-chim-cua-toi",
- storageBucket: "trai-chim-cua-toi.firebasestorage.app",
- messagingSenderId: "221656058023",
- appId: "1:221656058023:web:c44894b5a709f6a9863382"
-};
-const appFirebase = initializeApp(firebaseConfig);
-const auth = getAuth(appFirebase);
-const db = getFirestore(appFirebase);
-let records = [];
-let currentEggHistory = [];
-let currentUser = null;
-let cloudReady = false;
-const localKey = "birdFarmData_v7";
-const $ = id => document.getElementById(id);
-const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function setStatus(message){ $("syncStatus").textContent = message; }
-function formatDate(dateStr){ if(!dateStr)return "-"; const d=new Date(dateStr+"T00:00:00"); if(isNaN(d))return "-"; return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}`; }
-function addDays(dateStr,days){const d=new Date(dateStr+"T00:00:00");d.setDate(d.getDate()+days);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
-function calcDates(){
- const p=$("pairingDate").value;
- if(!p){$("soldDateDisplay").value="";$("relayLayDateDisplay").value="";$("relayCountdown").value="";return;}
- const sold=addDays(p,28), relay=addDays(p,45);
- $("soldDateDisplay").value=formatDate(sold);$("relayLayDateDisplay").value=formatDate(relay);
- const today=new Date();today.setHours(0,0,0,0);const target=new Date(relay+"T00:00:00");const diff=Math.round((target-today)/86400000);
- $("relayCountdown").value=diff>0?`Còn ${diff} ngày`:diff===0?"Hôm nay!":`Quá ${Math.abs(diff)} ngày`;
-}
-function calcHatchDate(){const d=$("layDate").value;$("hatchDateDisplay").value=d?formatDate(addDays(d,16)):"";$("nởDateDisplay").value=d?formatDate(addDays(d,18)):"";}
-function renderEggHistoryUI(){
- $("eggHistoryList").innerHTML=currentEggHistory.map((x,i)=>`<li>Ngày ${formatDate(x.date)}: <b>${esc(x.count)} quả</b> (${esc(x.status)}) <button type="button" onclick="removeEggHistory(${i})" style="float:right;padding:2px 6px;background:#ffebee;color:#b71c1c">Xóa</button></li>`).join("");
-}
 function addEggHistory(){
+
  const date=$("layDate").value,count=parseInt($("eggCount").value,10),status=$("eggStatus").value;
+
  if(!date||!count||count<1){alert("Vui lòng nhập ngày đẻ và số lượng trứng!");return;}
+
  currentEggHistory.push({date,count,status});renderEggHistoryUI();$("layDate").value="";$("eggCount").value="";calcHatchDate();
+
 }
+
 function removeEggHistory(i){currentEggHistory.splice(i,1);renderEggHistoryUI();}
+
 function getFormRecord(){
+
  const boxNumber=parseInt($("boxNumber").value,10);if(!boxNumber){alert("Vui lòng nhập Số Ô!");return null;}
+
  const editId=$("editId").value;
+
  const lay=$("layDate").value,count=parseInt($("eggCount").value,10);
+
  if(lay&&count>0)currentEggHistory.push({date:lay,count,status:$("eggStatus").value});
+
  return {id:editId?Number(editId):Date.now(),boxNumber,boxStatus:$("boxStatus").value,parentStatus:$("parentStatus").value,parentingRating:$("parentingRating").value,pairingDate:$("pairingDate").value,pairedBirds:parseInt($("pairedBirds").value,10)||0,incubateDate:$("incubateDate").value,incubateCount:parseInt($("incubateCount").value,10)||0,soldDate:$("soldDateDisplay").value,relayLayDate:$("relayLayDateDisplay").value,relayCountdown:$("relayCountdown").value,soldCount:parseInt($("soldCount").value,10)||0,actualSoldDate:$("actualSoldDate").value,eggHistory:[...currentEggHistory],transferFrom:$("transferFrom").value,transferTo:$("transferTo").value,transferDate:$("transferDate").value,deadDate:$("deadDate").value,deadAge:$("deadAge").value,deadCount:parseInt($("deadCount").value,10)||0,notes:$("notes").value};
+
 }
+
 async function persistCloud(){
+
  if(!currentUser||!cloudReady)throw new Error("Chưa đăng nhập hoặc dữ liệu chưa tải xong.");
+
  await setDoc(doc(db,"users",currentUser.uid,"farmData","main"),{records,updatedAt:new Date().toISOString()});
+
  localStorage.setItem(localKey,JSON.stringify(records));
+
  setStatus("☁️ Đã đồng bộ dữ liệu lên Firebase.");
+
 }
+
 async function saveData(){
+
  try{const r=getFormRecord();if(!r)return;const i=records.findIndex(x=>Number(x.id)===Number(r.id));if(i>=0&&$("editId").value)records[i]=r;else records.push(r);
+
  await persistCloud();alert(`Đã lưu thành công ô ${r.boxNumber}!`);resetForm();renderAll();
+
  }catch(e){console.error(e);alert("Chưa lưu được lên Firebase: "+e.message);setStatus("Lỗi đồng bộ. Kiểm tra kết nối và đăng nhập.");}
+
 }
+
 function editRecord(id){
+
  const r=records.find(x=>Number(x.id)===Number(id));if(!r)return;
+
  const values={editId:r.id,boxNumber:r.boxNumber,boxStatus:r.boxStatus,parentStatus:r.parentStatus,parentingRating:r.parentingRating,pairingDate:r.pairingDate,pairedBirds:r.pairedBirds,incubateDate:r.incubateDate,incubateCount:r.incubateCount,soldCount:r.soldCount,actualSoldDate:r.actualSoldDate,transferFrom:r.transferFrom,transferTo:r.transferTo,transferDate:r.transferDate,deadDate:r.deadDate,deadAge:r.deadAge,deadCount:r.deadCount,notes:r.notes};
+
  Object.entries(values).forEach(([k,v])=>$(k).value=v??"");currentEggHistory=Array.isArray(r.eggHistory)?r.eggHistory.map(x=>({...x})):[];renderEggHistoryUI();calcDates();
- $("formTitle").textContent="✏️ Sửa Ô "+r.boxNumber;$("btnSave").textContent="💾 CẬP NHẬT";$("btnSave").style.background="#2196f3";window.scrollTo({top:0,behavior:"smooth"});
+
+ $("formTitle").textContent="✏️ Sửa Ô "+r.boxNumber;$("btnSave").textContent="💾 CẬP NHẬT";$("btnSave").style.background="#2196f3";
+
+ document.querySelectorAll(".compact-group").forEach(el=>el.open=false);
+
+ window.scrollTo({top:0,behavior:"smooth"});
+
 }
+
 async function deleteRecord(id){
+
  if(!confirm("Chắc chắn xóa ô này?"))return;
+
  const old=records;records=records.filter(r=>Number(r.id)!==Number(id));
+
  try{await persistCloud();renderAll();}catch(e){records=old;alert("Không xóa được trên Firebase: "+e.message);}
+
 }
+
 function resetForm(){
+
  document.querySelectorAll("#app input, #app select, #app textarea").forEach(el=>el.value="");
+
  $("editId").value="";$("formTitle").textContent="➕ Thêm Thông Tin Ô Mới";$("btnSave").textContent="💾 LƯU THÔNG TIN";$("btnSave").style.background="var(--primary)";
+
  $("incubateCount").value=1;currentEggHistory=[];renderEggHistoryUI();
+
+ document.querySelectorAll(".compact-group").forEach(el=>el.open=false);
+
 }
+
 function showHistory(id){const r=records.find(x=>Number(x.id)===Number(id));if(!r)return;$("modalTitle").textContent="Lịch sử đẻ - Ô "+r.boxNumber;$("modalList").innerHTML=(r.eggHistory||[]).map(x=>`<li>${formatDate(x.date)}: ${esc(x.count)} quả - ${esc(x.status)}</li>`).join("")||"<li>Chưa có lịch sử</li>";$("historyModal").style.display="block";}
+
 function closeModal(){$("historyModal").style.display="none";}
+
 function renderTable(){
+
  const body=$("tableBody");
+
  if(!records.length){body.innerHTML='<tr><td colspan="9" style="text-align:center">Chưa có dữ liệu.</td></tr>';return;}
+
  body.innerHTML=[...records].sort((a,b)=>a.boxNumber-b.boxNumber).map(r=>{
+
  const eggs=(r.eggHistory||[]).map(x=>`${formatDate(x.date)}: ${esc(x.count)} quả`).join("<br>")||"-";
+
  const statusClass=r.boxStatus==="Đang hoạt động"?"bg-green":r.boxStatus==="Chờ đẻ"?"bg-orange":r.boxStatus==="Ô trống"?"bg-gray":"bg-blue";
+
  return `<tr><td><b>${esc(r.boxNumber)}</b></td><td><span class="badge ${statusClass}">${esc(r.boxStatus)}</span><br>${esc(r.parentStatus)}<br>Nuôi con: ${esc(r.parentingRating)}</td><td>${eggs}<br><button class="smallbtn" onclick="showHistory(${Number(r.id)})">Chi tiết</button></td><td>Ngày ấp: ${formatDate(r.incubateDate)}<br>Số tổ: ${esc(r.incubateCount||0)}<br>Trạng thái trứng: ${esc((r.eggHistory||[]).slice(-1)[0]?.status||"-")}</td><td>Ghép: ${formatDate(r.pairingDate)}<br>Số con: ${esc(r.pairedBirds||0)}<br>Bán: ${esc(r.soldCount||0)} con<br>Ngày bán: ${formatDate(r.actualSoldDate)}</td><td>${esc(r.relayLayDate||"-")}<br>${esc(r.relayCountdown||"")}</td><td>${esc(r.transferFrom||"-")} → ${esc(r.transferTo||"-")}<br>${formatDate(r.transferDate)}</td><td>${formatDate(r.deadDate)}<br>${esc(r.deadCount||0)} con<br>${esc(r.deadAge||"")}<br>${esc(r.notes||"")}</td><td><div class="action-btns"><button class="btn-edit" onclick="editRecord(${Number(r.id)})">Sửa</button><button class="btn-delete" onclick="deleteRecord(${Number(r.id)})">Xóa</button></div></td></tr>`;
+
  }).join("");
+
 }
+
 function renderSchedule(){
+
  const groups={};records.forEach(r=>(r.eggHistory||[]).forEach(e=>{if(!e.date)return;const date=addDays(e.date,16);(groups[date]??=[]).push(r.boxNumber);}));
+
  const today=new Date();today.setHours(0,0,0,0);
+
  $("hatchTableBody").innerHTML=Object.keys(groups).sort().map(date=>{const diff=Math.round((new Date(date+"T00:00:00")-today)/86400000);const cls=diff===0?"highlight-today":diff>0&&diff<=7?"highlight-upcoming":"";return `<tr class="${cls}"><td>${formatDate(date)}${diff===0?" (Hôm nay)":diff>0?` (còn ${diff} ngày)`:""}</td><td>${groups[date].length}</td><td>${groups[date].map(n=>"Ô "+esc(n)).join(", ")}</td></tr>`;}).join("")||'<tr><td colspan="3" style="text-align:center">Chưa có lịch nhắc.</td></tr>';
+
 }
+
 function renderDashboard(){
+
  const now=new Date(),month=now.getMonth(),year=now.getFullYear();
+
  $("totalBoxes").textContent=records.length;
+
  $("totalActive").textContent=records.filter(r=>r.boxStatus==="Đang hoạt động").length;
+
  $("totalWaiting").textContent=records.filter(r=>r.boxStatus==="Chờ đẻ").length;
+
  $("totalIncubating").textContent=records.filter(r=>r.boxStatus==="Đang ấp/Nuôi con").length;
+
  $("totalEmpty").textContent=records.filter(r=>r.boxStatus==="Ô trống").length;
+
  $("totalDeadMonth").textContent=records.filter(r=>{const d=new Date((r.deadDate||"")+"T00:00:00");return r.deadDate&&d.getMonth()===month&&d.getFullYear()===year;}).reduce((s,r)=>s+(r.deadCount||0),0);
+
  $("totalSoldMonth").textContent=records.filter(r=>{const d=new Date((r.actualSoldDate||"")+"T00:00:00");return r.actualSoldDate&&d.getMonth()===month&&d.getFullYear()===year;}).reduce((s,r)=>s+(r.soldCount||0),0);
+
 }
+
 function renderAll(){renderDashboard();renderTable();renderSchedule();}
+
 async function login(){
+
  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
+
  if(!email||!password){$("loginMessage").textContent="Vui lòng nhập email và mật khẩu.";return;}
+
  $("loginBtn").disabled=true;$("loginMessage").textContent="Đang đăng nhập...";
+
  try{await signInWithEmailAndPassword(auth,email,password);}catch(e){$("loginMessage").textContent="Đăng nhập chưa thành công: "+e.message;$("loginBtn").disabled=false;}
+
 }
+
 async function logout(){await signOut(auth);}
+
 onAuthStateChanged(auth,async user=>{
+
  currentUser=user;
- if(!user){$("app").style.display="none";$("loginPanel").style.display="block";$("loginBtn").disabled=false;return;}
+
+ if(!user){cloudReady=false;$("app").style.display="none";$("loginPanel").style.display="block";$("loginBtn").disabled=false;return;}
+
  $("loginPanel").style.display="none";$("app").style.display="block";setStatus("Đang tải dữ liệu Firebase...");
+
  try{
+
   const ref=doc(db,"users",user.uid,"farmData","main");const snap=await getDoc(ref);
+
   if(snap.exists()){const data=snap.data();records=Array.isArray(data.records)?data.records:[];localStorage.setItem(localKey,JSON.stringify(records));setStatus("☁️ Đã tải dữ liệu từ Firebase.");}
+
   else{
+
    let local=[];try{local=JSON.parse(localStorage.getItem(localKey)||"[]");}catch{}
+
    records=Array.isArray(local)?local:[];
+
    if(records.length&&confirm(`Tìm thấy ${records.length} mục dữ liệu đang lưu trên iPhone. Bạn có muốn chuyển chúng lên Firebase không?`)){
+
     await setDoc(ref,{records,updatedAt:new Date().toISOString()});setStatus("☁️ Đã chuyển dữ liệu cũ lên Firebase.");
+
    }else setStatus("Đã đăng nhập. Chưa có dữ liệu trên Firebase; dữ liệu sẽ được tạo khi bạn lưu.");
+
   }
+
   cloudReady=true;renderAll();
+
  }catch(e){cloudReady=false;setStatus("Không tải được dữ liệu: "+e.message);alert("Không tải được dữ liệu Firebase. Hãy kiểm tra Firestore Rules và kết nối.");}
+
 });
+
 Object.assign(window,{login,logout,calcDates,calcHatchDate,addEggHistory,removeEggHistory,saveData,editRecord,deleteRecord,resetForm,showHistory,closeModal});
+
 window.addEventListener("click",e=>{if(e.target===$("historyModal"))closeModal();});
-</script>
-</body>
-</html>
