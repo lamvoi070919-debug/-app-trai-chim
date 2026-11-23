@@ -7,7 +7,7 @@
     <style>
         :root { --primary: #2e7d32; --bg: #f4f7f6; --card: #ffffff; --text: #333; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--text); font-size: 14px; }
-        .container { max-width: 1000px; margin: auto; }
+        .container { max-width: 1100px; margin: auto; }
         
         /* Dashboard */
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 15px; }
@@ -66,7 +66,7 @@
         <div class="stat-card" style="border-top-color: #009688;"><h3>Tổng Ô</h3><p id="totalBoxes" style="color: #009688;">0</p></div>
         <div class="stat-card" style="border-top-color: #673ab7;"><h3>Hoạt Động</h3><p id="totalActive" style="color: #673ab7;">0</p></div>
         <div class="stat-card" style="border-top-color: #ff9800;"><h3>Chờ Đẻ</h3><p id="totalWaiting" style="color: #ff9800;">0</p></div>
-        <div class="stat-card" style="border-top-color: #2196f3;"><h3>Ấp/Nuôi</h3><p id="totalIncubating" style="color: #2196f3;">0</p></div>
+        <div class="stat-card" style="border-top-color: #2196f3;"><h3>Đang Ấp</h3><p id="totalIncubating" style="color: #2196f3;">0</p></div>
         <div class="stat-card" style="border-top-color: #9e9e9e;"><h3>Ô Trống</h3><p id="totalEmpty" style="color: #9e9e9e;">0</p></div>
         <div class="stat-card" style="border-top-color: #f44336;"><h3>Chết Tháng</h3><p id="totalDeadMonth" style="color: #f44336;">0</p></div>
         <div class="stat-card" style="border-top-color: #4caf50;"><h3>Bán Tháng</h3><p id="totalSoldMonth" style="color: #4caf50;">0</p></div>
@@ -105,15 +105,16 @@
             <div class="form-group"><label>Số Con Ghép:</label><input type="number" id="pairedBirds" placeholder="Số con..." oninput="calcDates()"></div>
         </div>
 
-        <!-- TRỨNG & NGÀY ĐẺ -->
-        <div class="sub-title" style="color: #d32f2f;">🥚 Thông tin Trứng & Sinh Sản</div>
+        <!-- MỤC ẤP TRỨNG VÀ THEO DÕI TỔ ẤP -->
+        <div class="sub-title" style="color: #d32f2f;">🥚 Ấp Trứng & Theo Dõi Tổ Ấp</div>
         <div class="grid-3" style="background: #fff3e0; padding: 6px; border-radius: 6px;">
             <div class="form-group"><label>Ngày Đẻ Quả Thứ 2:</label><input type="date" id="layDate" onchange="calcHatchDate()"></div>
-            <div class="form-group"><label>Ngày Ghép Con (Tự động +16 ngày):</label><input type="text" id="hatchDateDisplay" readonly style="background: #fff; font-weight: bold; color: #d84315;"></div>
-            <div class="form-group"><label>Ngày Nở (Tự động +18 ngày):</label><input type="text" id="nởDateDisplay" readonly style="background: #fff; font-weight: bold; color: #d32f2f;"></div>
+            <div class="form-group"><label>Ngày Bắt Đầu Ấp:</label><input type="date" id="incubateDate"></div>
+            <div class="form-group"><label>Số Tổ Đang Ấp:</label><input type="number" id="incubateCount" placeholder="Số tổ..." value="1"></div>
         </div>
         <div class="grid-3" style="margin-top: 4px;">
-            <div class="form-group"><label>Tổng Số Trứng:</label><input type="number" id="eggCount" placeholder="Số quả..."></div>
+            <div class="form-group"><label>Ngày Ghép Con (+16 ngày):</label><input type="text" id="hatchDateDisplay" readonly style="background: #fff; font-weight: bold; color: #d84315;"></div>
+            <div class="form-group"><label>Ngày Nở (+18 ngày):</label><input type="text" id="nởDateDisplay" readonly style="background: #fff; font-weight: bold; color: #d32f2f;"></div>
             <div class="form-group"><label>Trạng Thái Trứng:</label>
                 <select id="eggStatus">
                     <option value="Bình thường">Bình thường</option>
@@ -122,6 +123,9 @@
                     <option value="Phôi chết lưu">Phôi chết lưu</option>
                 </select>
             </div>
+        </div>
+        <div class="grid-2" style="margin-top: 4px;">
+            <div class="form-group"><label>Tổng Số Trứng Đẻ:</label><input type="number" id="eggCount" placeholder="Số quả..."></div>
             <div class="form-group" style="display: flex; align-items: flex-end;">
                 <button type="button" onclick="addEggHistory()" style="flex: 1; padding: 6px; font-size: 12px; background: #ff9800; color: white; height: 30px;">+ Lưu lịch sử đẻ</button>
             </div>
@@ -169,14 +173,14 @@
         <table>
             <thead>
                 <tr>
-                    <th>Số Ô</th><th>Trạng Thái / Bố Mẹ</th><th>Lịch Sử Đẻ</th><th>Ghép Con & Bán</th><th>Dự Kiến Đẻ Lại</th><th>Chuyển Tổ</th><th>Chết</th><th>Hành Động</th>
+                    <th>Số Ô</th><th>Trạng Thái / Bố Mẹ</th><th>Lịch Sử Đẻ</th><th>Ấp Trứng / Tổ Ấp</th><th>Ghép Con & Bán</th><th>Dự Kiến Đẻ Lại</th><th>Chuyển Tổ</th><th>Chết</th><th>Hành Động</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
 
-    <!-- BẢNG NHẮC GHÉP CON (LOGIC MỚI: TỪ QUẢ THỨ 2 + 16 NGÀY) -->
+    <!-- BẢNG NHẮC GHÉP CON -->
     <div class="table-section">
         <h3 class="section-title" style="color: #d84315; border-bottom-color: #d84315;">⏰ Lịch Nhắc Ghép Con (Quả thứ 2 + 16 ngày)</h3>
         <p style="font-size: 12px; color: #666; margin-top: 0;">Hệ thống tự động lấy ngày đẻ quả thứ 2, cộng thêm 16 ngày để ra ngày cần ghép con. Những ngày có màu đỏ là hôm nay, màu xanh là sắp tới.</p>
@@ -206,14 +210,14 @@
     // Khởi tạo dữ liệu
     let records = [];
     try {
-        const saved = localStorage.getItem('birdFarmData_v5'); // Key mới
+        const saved = localStorage.getItem('birdFarmData_v7'); 
         records = saved ? JSON.parse(saved) : [];
         if (!Array.isArray(records)) records = [];
     } catch (e) { records = []; }
 
     let currentEggHistory = [];
 
-    // Hàm format ngày DD/MM/YYYY
+    // Format ngày DD/MM/YYYY
     function formatDate(dateStr) {
         if(!dateStr) return "-";
         const d = new Date(dateStr);
@@ -221,7 +225,7 @@
         return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
     }
 
-    // Tính ngày bán (ghép + 28) và đẻ lại (ghép + 45)
+    // Tính ngày bán và đẻ lại (từ ngày ghép con)
     function calcDates() {
         const pairDate = document.getElementById('pairingDate').value;
         const soldDateInput = document.getElementById('soldDateDisplay');
@@ -261,7 +265,7 @@
         }
     }
 
-    // TÍNH NGÀY GHÉP CON (TỪ QUẢ THỨ 2 + 16 NGÀY) VÀ NGÀY NỞ (+18 NGÀY)
+    // TÍNH NGÀY GHÉP CON (QUẢ THỨ 2 + 16 NGÀY) VÀ NGÀY NỞ (+18)
     function calcHatchDate() {
         const layDate = document.getElementById('layDate').value;
         const hatchDisplay = document.getElementById('hatchDateDisplay');
@@ -270,12 +274,10 @@
         if(layDate) {
             const d = new Date(layDate);
             
-            // Ngày ghép con: Quả thứ 2 + 16 ngày
             let hatchD = new Date(d);
             hatchD.setDate(hatchD.getDate() + 16);
             hatchDisplay.value = formatDate(hatchD.toISOString().split('T')[0]);
 
-            // Ngày nở: Quả thứ 2 + 18 ngày
             let nởD = new Date(d);
             nởD.setDate(nởD.getDate() + 18);
             nởDisplay.value = formatDate(nởD.toISOString().split('T')[0]);
@@ -340,6 +342,8 @@
                 parentingRating: document.getElementById('parentingRating').value,
                 pairingDate: document.getElementById('pairingDate').value,
                 pairedBirds: parseInt(document.getElementById('pairedBirds').value) || 0,
+                incubateDate: document.getElementById('incubateDate').value,
+                incubateCount: parseInt(document.getElementById('incubateCount').value) || 0,
                 soldDate: document.getElementById('soldDateDisplay').value,
                 relayLayDate: document.getElementById('relayLayDateDisplay').value,
                 relayCountdown: document.getElementById('relayCountdown').value,
@@ -362,7 +366,7 @@
                 records.push(newRecord);
             }
 
-            localStorage.setItem('birdFarmData_v5', JSON.stringify(records)); 
+            localStorage.setItem('birdFarmData_v7', JSON.stringify(records)); 
             
             alert(`Đã lưu thành công ô ${newRecord.boxNumber}!`);
             resetForm(); 
@@ -385,6 +389,8 @@
         document.getElementById('parentingRating').value = record.parentingRating;
         document.getElementById('pairingDate').value = record.pairingDate || '';
         document.getElementById('pairedBirds').value = record.pairedBirds || '';
+        document.getElementById('incubateDate').value = record.incubateDate || '';
+        document.getElementById('incubateCount').value = record.incubateCount || 1;
         document.getElementById('soldCount').value = record.soldCount || '';
         document.getElementById('actualSoldDate').value = record.actualSoldDate || '';
         
@@ -412,7 +418,7 @@
     function deleteRecord(id) {
         if (confirm("Chắc chắn xóa ô này?")) {
             records = records.filter(r => r.id !== id);
-            localStorage.setItem('birdFarmData_v5', JSON.stringify(records));
+            localStorage.setItem('birdFarmData_v7', JSON.stringify(records));
             renderAll();
         }
     }
@@ -429,6 +435,7 @@
         document.getElementById('relayCountdown').value = "";
         document.getElementById('hatchDateDisplay').value = "";
         document.getElementById('nởDateDisplay').value = "";
+        document.getElementById('incubateCount').value = 1;
         currentEggHistory = [];
         renderEggHistoryUI();
     }
@@ -438,7 +445,7 @@
         const tbody = document.getElementById('tableBody'); 
         tbody.innerHTML = '';
         if (records.length === 0) { 
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Chưa có dữ liệu.</td></tr>'; return; 
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Chưa có dữ liệu.</td></tr>'; return; 
         }
         const sorted = [...records].sort((a, b) => a.boxNumber - b.boxNumber);
 
@@ -463,6 +470,16 @@
             }
             eggHtml += `</td>`;
 
+            // Cột Ấp trứng / Tổ ấp
+            let incubateHtml = `<td style="font-size:11px;">`;
+            if(r.incubateDate) {
+                incubateHtml += `Bắt đầu ấp: ${formatDate(r.incubateDate)}<br>`;
+                incubateHtml += `Số tổ ấp: <b style="color:#d84315">${r.incubateCount || 1}</b>`;
+            } else {
+                incubateHtml += `<span style="color:#999;">-</span>`;
+            }
+            incubateHtml += `</td>`;
+
             let pairHtml = `<td style="font-size:11px;">`;
             if(r.pairingDate) {
                 pairHtml += `Ghép: ${formatDate(r.pairingDate)}<br>Con: <b>${r.pairedBirds}</b><br>`;
@@ -483,33 +500,4 @@
             relayHtml += `</td>`;
 
             let transferHtml = `<td style="font-size:11px;">`;
-            if(r.transferFrom || r.transferTo) {
-                transferHtml += `<span class="badge bg-orange">Đi: ${r.transferFrom || '?'}</span><br>`;
-                transferHtml += `<span class="badge bg-green">Đến: ${r.transferTo || '?'}</span><br>`;
-                transferHtml += `${formatDate(r.transferDate)}`;
-            } else {
-                transferHtml += `<span style="color:#999;">-</span>`;
-            }
-            transferHtml += `</td>`;
-
-            let deadHtml = `<td style="font-size:11px; color: ${r.deadCount > 0 ? 'red' : 'inherit'};">`;
-            if(r.deadCount > 0) {
-                deadHtml += `SL: <b>${r.deadCount}</b><br>Ngày: ${formatDate(r.deadDate)}<br>Tuổi: ${r.deadAge}<br>${r.notes || ''}`;
-            } else {
-                deadHtml += `<span style="color:#999;">-</span>`;
-            }
-            deadHtml += `</td>`;
-
-            let actionHtml = `<td><div class="action-btns">
-                <button class="btn-edit" onclick="editRecord(${r.id})">Sửa</button>
-                <button class="btn-delete" onclick="deleteRecord(${r.id})">Xóa</button>
-            </div></td>`;
-
-            tr.innerHTML = html1 + eggHtml + pairHtml + relayHtml + transferHtml + deadHtml + actionHtml;
-            tbody.appendChild(tr);
-        });
-    }
-
-    // HIỂN THỊ BẢNG NHẮC GHÉP CON (MỚI)
-    function renderHatchSchedule() {
-        const tbody = document
+            if(r.transferFrom
