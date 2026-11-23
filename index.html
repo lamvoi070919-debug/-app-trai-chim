@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Trại Chim Thông Minh</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Quản Lý Trại Chim</title>
     <style>
         :root { --primary: #2e7d32; --bg: #f4f7f6; --card: #ffffff; --text: #333; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--text); font-size: 14px; }
         .container { max-width: 1000px; margin: auto; }
         
         /* Dashboard */
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        .stat-card { background: var(--card); padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; border-top: 4px solid var(--primary); }
-        .stat-card h3 { margin: 0; font-size: 12px; color: #666; }
-        .stat-card p { margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: var(--primary); }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 15px; }
+        .stat-card { background: var(--card); padding: 8px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; border-top: 4px solid var(--primary); }
+        .stat-card h3 { margin: 0; font-size: 11px; color: #666; }
+        .stat-card p { margin: 5px 0 0 0; font-size: 18px; font-weight: bold; color: var(--primary); }
 
         /* Form */
         .form-section { background: var(--card); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .section-title { font-size: 16px; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-bottom: 10px; margin-top: 0; font-weight: bold; }
-        .sub-title { font-size: 14px; border-bottom: 1px dashed #ccc; margin-top: 15px; margin-bottom: 8px; font-weight: bold; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .form-group { margin-bottom: 10px; }
-        label { display: block; font-weight: 600; margin-bottom: 3px; font-size: 12px; color: #555; }
+        .section-title { font-size: 15px; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-bottom: 10px; margin-top: 0; font-weight: bold; }
+        .sub-title { font-size: 13px; border-bottom: 1px dashed #ccc; margin-top: 12px; margin-bottom: 8px; font-weight: bold; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .form-group { margin-bottom: 8px; }
+        label { display: block; font-weight: 600; margin-bottom: 2px; font-size: 12px; color: #555; }
         input, select, textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 13px; }
         
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
@@ -32,30 +31,35 @@
         .btn-reset { background: #9e9e9e; color: white; }
         
         /* Table */
-        .table-section { background: var(--card); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-size: 12px; vertical-align: top; }
+        .table-section { background: var(--card); padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th, td { padding: 6px; text-align: left; border-bottom: 1px solid #ddd; font-size: 12px; vertical-align: top; }
         th { background: #e8f5e9; color: var(--primary); font-weight: bold; }
         tr:hover { background: #f1f8e9; }
-        .badge { padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: bold; color: white; display: inline-block; margin-bottom: 2px;}
+        .badge { padding: 2px 5px; border-radius: 8px; font-size: 10px; font-weight: bold; color: white; display: inline-block; margin-bottom: 2px;}
         .bg-green { background: #4caf50; } .bg-red { background: #f44336; } .bg-yellow { background: #ffc107; color: #333; } .bg-blue { background: #2196f3; } .bg-orange { background: #ff9800; } .bg-gray { background: #9e9e9e; }
         
-        .action-btns { display: flex; gap: 5px; }
-        .btn-edit { background: #ffc107; color: #333; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; }
-        .btn-delete { background: #ff5252; color: white; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+        .action-btns { display: flex; gap: 4px; }
+        .btn-edit { background: #ffc107; color: #333; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+        .btn-delete { background: #ff5252; color: white; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-size: 11px; }
 
-        /* Modal Lịch Sử */
+        /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px; position: relative; max-height: 80vh; overflow-y: auto;}
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 400px; position: relative; max-height: 80vh; overflow-y: auto;}
         .close { position: absolute; right: 15px; top: 10px; color: #aaa; font-size: 24px; font-weight: bold; cursor: pointer; }
         .history-list { list-style: none; padding: 0; margin: 0; }
-        .history-list li { padding: 8px; border-bottom: 1px dashed #ccc; font-size: 13px; }
+        .history-list li { padding: 6px; border-bottom: 1px dashed #ccc; font-size: 13px; }
+        
+        /* Lịch nhắc ghép con */
+        .hatch-schedule-table th { background: #d84315; color: white; }
+        .highlight-today { background: #ffebee; color: #c62828; font-weight: bold; border-left: 4px solid #f44336; }
+        .highlight-upcoming { background: #e8f5e9; color: #2e7d32; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align: center; color: var(--primary); margin-bottom: 15px;">🐦 QUẢN LÝ TRẠI CHIM</h2>
+    <h2 style="text-align: center; color: var(--primary); margin-bottom: 10px;">🐦 QUẢN LÝ TRẠI CHIM</h2>
 
     <!-- DASHBOARD -->
     <div class="dashboard">
@@ -97,15 +101,18 @@
             <div class="form-group"><label>Đánh Giá Nuôi Con:</label>
                 <select id="parentingRating"><option value="Chưa đánh giá">Chưa đánh giá</option><option value="Đạt">Đạt</option><option value="Không đạt">Không đạt</option></select>
             </div>
-            <!-- TỰ ĐỘNG TÍNH NGÀY BÁN KHI CHỌN NGÀY GHÉP -->
             <div class="form-group"><label>Ngày Ghép Con:</label><input type="date" id="pairingDate" onchange="calcDates()"></div>
             <div class="form-group"><label>Số Con Ghép:</label><input type="number" id="pairedBirds" placeholder="Số con..." oninput="calcDates()"></div>
         </div>
 
         <!-- TRỨNG & NGÀY ĐẺ -->
         <div class="sub-title" style="color: #d32f2f;">🥚 Thông tin Trứng & Sinh Sản</div>
-        <div class="grid-3" style="background: #fff3e0; padding: 8px; border-radius: 6px;">
-            <div class="form-group"><label>Ngày Đẻ Trứng:</label><input type="date" id="layDate"></div>
+        <div class="grid-3" style="background: #fff3e0; padding: 6px; border-radius: 6px;">
+            <div class="form-group"><label>Ngày Đẻ Quả Thứ 2:</label><input type="date" id="layDate" onchange="calcHatchDate()"></div>
+            <div class="form-group"><label>Ngày Ghép Con (Tự động +16 ngày):</label><input type="text" id="hatchDateDisplay" readonly style="background: #fff; font-weight: bold; color: #d84315;"></div>
+            <div class="form-group"><label>Ngày Nở (Tự động +18 ngày):</label><input type="text" id="nởDateDisplay" readonly style="background: #fff; font-weight: bold; color: #d32f2f;"></div>
+        </div>
+        <div class="grid-3" style="margin-top: 4px;">
             <div class="form-group"><label>Tổng Số Trứng:</label><input type="number" id="eggCount" placeholder="Số quả..."></div>
             <div class="form-group"><label>Trạng Thái Trứng:</label>
                 <select id="eggStatus">
@@ -115,28 +122,27 @@
                     <option value="Phôi chết lưu">Phôi chết lưu</option>
                 </select>
             </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+                <button type="button" onclick="addEggHistory()" style="flex: 1; padding: 6px; font-size: 12px; background: #ff9800; color: white; height: 30px;">+ Lưu lịch sử đẻ</button>
+            </div>
         </div>
-        <div style="text-align: right; margin-top: 5px;">
-            <button type="button" onclick="addEggHistory()" style="flex: none; padding: 5px 10px; font-size: 12px; background: #ff9800; color: white;">+ Thêm lịch sử đẻ</button>
-        </div>
-        <ul id="eggHistoryList" class="history-list" style="margin-top: 5px; font-size: 12px; color: #555;"></ul>
+        <ul id="eggHistoryList" class="history-list" style="margin-top: 4px; font-size: 12px; color: #555;"></ul>
 
         <!-- XUẤT BÁN & ĐẺ LẠI -->
         <div class="sub-title" style="color: #2e7d32;">💰 Dự Kiến Xuất Bán & Đẻ Lại</div>
-        <div class="grid-3" style="background: #e8f5e9; padding: 8px; border-radius: 6px;">
-            <div class="form-group"><label>Ngày Bán Dự Kiến (Tự động +28 ngày):</label><input type="text" id="soldDateDisplay" readonly style="background: #fff; font-weight: bold; color: #2e7d32;"></div>
-            <!-- Ô TỰ ĐỘNG TÍNH NGÀY ĐẺ LẠI (CỘNG 45 NGÀY TỪ NGÀY GHÉP) -->
-            <div class="form-group"><label>Dự Kiến Đẻ Lại (Từ ngày ghép + 45 ngày):</label><input type="text" id="relayLayDateDisplay" readonly style="background: #fff; font-weight: bold; color: #c62828;"></div>
-            <div class="form-group"><label>Thời Gian Còn Lại:</label><input type="text" id="relayCountdown" readonly style="background: #fff; font-weight: bold; color: #d32f2f;"></div>
+        <div class="grid-3" style="background: #e8f5e9; padding: 6px; border-radius: 6px;">
+            <div class="form-group"><label>Ngày Bán DK (+28 ngày):</label><input type="text" id="soldDateDisplay" readonly style="background: #fff; font-weight: bold; color: #2e7d32;"></div>
+            <div class="form-group"><label>Ngày Đẻ Lại (+45 ngày):</label><input type="text" id="relayLayDateDisplay" readonly style="background: #fff; font-weight: bold; color: #c62828;"></div>
+            <div class="form-group"><label>Đếm Ngược Đẻ Lại:</label><input type="text" id="relayCountdown" readonly style="background: #fff; font-weight: bold; color: #d32f2f;"></div>
         </div>
-        <div class="grid-3" style="margin-top: 5px;">
+        <div class="grid-2" style="margin-top: 4px;">
             <div class="form-group"><label>Số Con Dự Kiến Bán:</label><input type="number" id="soldCount" placeholder="SL thực tế..."></div>
             <div class="form-group"><label>Ngày Bán Thực Tế:</label><input type="date" id="actualSoldDate"></div>
         </div>
 
         <!-- CHUYỂN TỔ -->
         <div class="sub-title" style="color: #1976d2;">🔄 Theo Dõi Chuyển Tổ</div>
-        <div class="grid-3" style="background: #e3f2fd; padding: 8px; border-radius: 6px;">
+        <div class="grid-3" style="background: #e3f2fd; padding: 6px; border-radius: 6px;">
             <div class="form-group"><label>Tổ Đi (Số Ô):</label><input type="text" id="transferFrom" placeholder="VD: 101"></div>
             <div class="form-group"><label>Tổ Đến (Số Ô):</label><input type="text" id="transferTo" placeholder="VD: 102"></div>
             <div class="form-group"><label>Ngày Chuyển:</label><input type="date" id="transferDate"></div>
@@ -144,20 +150,20 @@
 
         <!-- CHIM CHẾT -->
         <div class="sub-title" style="color: #c62828;">💀 Theo Dõi Chim Chết</div>
-        <div class="grid-3" style="background: #ffebee; padding: 8px; border-radius: 6px;">
+        <div class="grid-3" style="background: #ffebee; padding: 6px; border-radius: 6px;">
             <div class="form-group"><label>Ngày Chết:</label><input type="date" id="deadDate"></div>
             <div class="form-group"><label>Tuổi Chim Chết:</label><input type="text" id="deadAge" placeholder="VD: 3 ngày tuổi"></div>
             <div class="form-group"><label>Số Lượng Chết:</label><input type="number" id="deadCount" placeholder="Số con..."></div>
         </div>
-        <div class="form-group" style="margin-top: 5px;"><label>Lý Do Chết / Ghi Chú:</label><textarea id="notes" rows="1" placeholder="Ghi chú cụ thể..."></textarea></div>
+        <div class="form-group" style="margin-top: 4px;"><label>Lý Do Chết / Ghi Chú:</label><textarea id="notes" rows="1" placeholder="Ghi chú..."></textarea></div>
 
         <div class="btn-group">
             <button class="btn-save" onclick="saveData()" id="btnSave">💾 LƯU THÔNG TIN</button>
-            <button class="btn-reset" onclick="resetForm()">🔄 LÀM MỚI FORM</button>
+            <button class="btn-reset" onclick="resetForm()">🔄 LÀM MỚI</button>
         </div>
     </div>
 
-    <!-- BẢNG DỮ LIỆU -->
+    <!-- BẢNG DỮ LIỆU CHÍNH -->
     <div class="table-section">
         <h3 class="section-title">📋 Bảng Tổng Hợp Trại</h3>
         <table>
@@ -169,20 +175,42 @@
             <tbody id="tableBody"></tbody>
         </table>
     </div>
+
+    <!-- BẢNG NHẮC GHÉP CON (LOGIC MỚI: TỪ QUẢ THỨ 2 + 16 NGÀY) -->
+    <div class="table-section">
+        <h3 class="section-title" style="color: #d84315; border-bottom-color: #d84315;">⏰ Lịch Nhắc Ghép Con (Quả thứ 2 + 16 ngày)</h3>
+        <p style="font-size: 12px; color: #666; margin-top: 0;">Hệ thống tự động lấy ngày đẻ quả thứ 2, cộng thêm 16 ngày để ra ngày cần ghép con. Những ngày có màu đỏ là hôm nay, màu xanh là sắp tới.</p>
+        <table class="hatch-schedule-table">
+            <thead>
+                <tr>
+                    <th>Ngày Cần Ghép Con</th>
+                    <th>Số Tổ Cần Ghép</th>
+                    <th>Chi Tiết Các Ô</th>
+                </tr>
+            </thead>
+            <tbody id="hatchTableBody"></tbody>
+        </table>
+    </div>
 </div>
 
-<!-- MODAL XEM LỊCH SỬ -->
+<!-- MODAL XEM LỊCH SỬ ĐẺ -->
 <div id="historyModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
-        <h3 id="modalTitle" style="color: var(--primary); margin-top: 0;">Lịch sử</h3>
+        <h3 id="modalTitle" style="color: var(--primary); margin-top: 0;">Chi tiết</h3>
         <ul id="modalList" class="history-list"></ul>
     </div>
 </div>
 
 <script>
-    // Khởi tạo dữ liệu từ LocalStorage
-    let records = JSON.parse(localStorage.getItem('birdFarmData_v3')) || [];
+    // Khởi tạo dữ liệu
+    let records = [];
+    try {
+        const saved = localStorage.getItem('birdFarmData_v5'); // Key mới
+        records = saved ? JSON.parse(saved) : [];
+        if (!Array.isArray(records)) records = [];
+    } catch (e) { records = []; }
+
     let currentEggHistory = [];
 
     // Hàm format ngày DD/MM/YYYY
@@ -193,7 +221,7 @@
         return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
     }
 
-    // TỰ ĐỘNG TÍNH NGÀY BÁN VÀ NGÀY ĐẺ LẠI
+    // Tính ngày bán (ghép + 28) và đẻ lại (ghép + 45)
     function calcDates() {
         const pairDate = document.getElementById('pairingDate').value;
         const soldDateInput = document.getElementById('soldDateDisplay');
@@ -203,30 +231,27 @@
         if(pairDate) {
             const d = new Date(pairDate);
             
-            // 1. Ngày bán dự kiến = Ngày ghép + 28 ngày
             let soldD = new Date(d);
             soldD.setDate(soldD.getDate() + 28);
             soldDateInput.value = formatDate(soldD.toISOString().split('T')[0]);
 
-            // 2. Ngày đẻ lại dự kiến = Ngày ghép + 45 ngày
             let relayD = new Date(d);
             relayD.setDate(relayD.getDate() + 45);
             relayLayInput.value = formatDate(relayD.toISOString().split('T')[0]);
 
-            // 3. Đếm ngược số ngày còn lại tới ngày đẻ lại
             const today = new Date();
             today.setHours(0,0,0,0);
             const diffTime = relayD.getTime() - today.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
             if (diffDays > 0) {
-                countdownInput.value = `Còn ${diffDays} ngày nữa`;
+                countdownInput.value = `Còn ${diffDays} ngày`;
                 countdownInput.style.color = "#d32f2f";
             } else if (diffDays === 0) {
-                countdownInput.value = "Đẻ hôm nay!";
+                countdownInput.value = "Hôm nay!";
                 countdownInput.style.color = "#ff9800";
             } else {
-                countdownInput.value = `Đã quá ${Math.abs(diffDays)} ngày`;
+                countdownInput.value = `Quá ${Math.abs(diffDays)} ngày`;
                 countdownInput.style.color = "#9e9e9e";
             }
         } else {
@@ -236,7 +261,31 @@
         }
     }
 
-    // Thêm lịch sử đẻ (Lưu được nhiều ngày)
+    // TÍNH NGÀY GHÉP CON (TỪ QUẢ THỨ 2 + 16 NGÀY) VÀ NGÀY NỞ (+18 NGÀY)
+    function calcHatchDate() {
+        const layDate = document.getElementById('layDate').value;
+        const hatchDisplay = document.getElementById('hatchDateDisplay');
+        const nởDisplay = document.getElementById('nởDateDisplay');
+
+        if(layDate) {
+            const d = new Date(layDate);
+            
+            // Ngày ghép con: Quả thứ 2 + 16 ngày
+            let hatchD = new Date(d);
+            hatchD.setDate(hatchD.getDate() + 16);
+            hatchDisplay.value = formatDate(hatchD.toISOString().split('T')[0]);
+
+            // Ngày nở: Quả thứ 2 + 18 ngày
+            let nởD = new Date(d);
+            nởD.setDate(nởD.getDate() + 18);
+            nởDisplay.value = formatDate(nởD.toISOString().split('T')[0]);
+        } else {
+            hatchDisplay.value = "";
+            nởDisplay.value = "";
+        }
+    }
+
+    // Thêm lịch sử đẻ
     function addEggHistory() {
         const date = document.getElementById('layDate').value;
         const count = document.getElementById('eggCount').value;
@@ -247,9 +296,10 @@
         currentEggHistory.push({ date, count: parseInt(count), status });
         renderEggHistoryUI();
         
-        // Reset ô nhập
         document.getElementById('layDate').value = "";
         document.getElementById('eggCount').value = "";
+        document.getElementById('hatchDateDisplay').value = "";
+        document.getElementById('nởDateDisplay').value = "";
     }
 
     function renderEggHistoryUI() {
@@ -266,59 +316,65 @@
 
     // LƯU DỮ LIỆU
     function saveData() {
-        const boxNumber = document.getElementById('boxNumber').value;
-        if (!boxNumber) { alert("Vui lòng nhập Số Ô!"); return; }
+        try {
+            const boxNumber = document.getElementById('boxNumber').value;
+            if (!boxNumber) { alert("Vui lòng nhập Số Ô!"); return; }
 
-        const editId = document.getElementById('editId').value;
-        
-        // Nếu có nhập ngày đẻ trực tiếp trên form mà chưa bấm "Thêm", tự động gom vào lịch sử
-        const currentLayDate = document.getElementById('layDate').value;
-        const currentEggCount = document.getElementById('eggCount').value;
-        if(currentLayDate && currentEggCount) {
-            currentEggHistory.push({ 
-                date: currentLayDate, 
-                count: parseInt(currentEggCount), 
-                status: document.getElementById('eggStatus').value 
-            });
+            const editId = document.getElementById('editId').value;
+            
+            const currentLayDate = document.getElementById('layDate').value;
+            const currentEggCount = document.getElementById('eggCount').value;
+            if(currentLayDate && currentEggCount) {
+                currentEggHistory.push({ 
+                    date: currentLayDate, 
+                    count: parseInt(currentEggCount), 
+                    status: document.getElementById('eggStatus').value 
+                });
+            }
+
+            const newRecord = {
+                id: editId ? parseInt(editId) : Date.now(),
+                boxNumber: parseInt(boxNumber),
+                boxStatus: document.getElementById('boxStatus').value,
+                parentStatus: document.getElementById('parentStatus').value,
+                parentingRating: document.getElementById('parentingRating').value,
+                pairingDate: document.getElementById('pairingDate').value,
+                pairedBirds: parseInt(document.getElementById('pairedBirds').value) || 0,
+                soldDate: document.getElementById('soldDateDisplay').value,
+                relayLayDate: document.getElementById('relayLayDateDisplay').value,
+                relayCountdown: document.getElementById('relayCountdown').value,
+                soldCount: parseInt(document.getElementById('soldCount').value) || 0,
+                actualSoldDate: document.getElementById('actualSoldDate').value,
+                eggHistory: currentEggHistory,
+                transferFrom: document.getElementById('transferFrom').value,
+                transferTo: document.getElementById('transferTo').value,
+                transferDate: document.getElementById('transferDate').value,
+                deadDate: document.getElementById('deadDate').value,
+                deadAge: document.getElementById('deadAge').value,
+                deadCount: parseInt(document.getElementById('deadCount').value) || 0,
+                notes: document.getElementById('notes').value
+            };
+
+            if (editId) {
+                const index = records.findIndex(r => r.id === parseInt(editId));
+                if (index !== -1) records[index] = newRecord;
+            } else {
+                records.push(newRecord);
+            }
+
+            localStorage.setItem('birdFarmData_v5', JSON.stringify(records)); 
+            
+            alert(`Đã lưu thành công ô ${newRecord.boxNumber}!`);
+            resetForm(); 
+            renderAll();
+            
+        } catch (error) {
+            alert("Có lỗi xảy ra khi lưu: " + error.message);
+            console.error(error);
         }
-
-        const newRecord = {
-            id: editId ? parseInt(editId) : Date.now(),
-            boxNumber: parseInt(boxNumber),
-            boxStatus: document.getElementById('boxStatus').value,
-            parentStatus: document.getElementById('parentStatus').value,
-            parentingRating: document.getElementById('parentingRating').value,
-            pairingDate: document.getElementById('pairingDate').value,
-            pairedBirds: parseInt(document.getElementById('pairedBirds').value) || 0,
-            soldDate: document.getElementById('soldDateDisplay').value,
-            relayLayDate: document.getElementById('relayLayDateDisplay').value, // Lưu ngày đẻ lại
-            relayCountdown: document.getElementById('relayCountdown').value,   // Lưu số ngày đếm ngược
-            soldCount: parseInt(document.getElementById('soldCount').value) || 0,
-            actualSoldDate: document.getElementById('actualSoldDate').value,
-            eggHistory: currentEggHistory,
-            transferFrom: document.getElementById('transferFrom').value,
-            transferTo: document.getElementById('transferTo').value,
-            transferDate: document.getElementById('transferDate').value,
-            deadDate: document.getElementById('deadDate').value,
-            deadAge: document.getElementById('deadAge').value,
-            deadCount: parseInt(document.getElementById('deadCount').value) || 0,
-            notes: document.getElementById('notes').value
-        };
-
-        if (editId) {
-            const index = records.findIndex(r => r.id === parseInt(editId));
-            if (index !== -1) records[index] = newRecord;
-            alert(`Đã cập nhật ô ${newRecord.boxNumber}!`);
-        } else {
-            records.push(newRecord);
-            alert(`Đã thêm mới ô ${newRecord.boxNumber}!`);
-        }
-
-        localStorage.setItem('birdFarmData_v3', JSON.stringify(records)); 
-        resetForm(); renderAll();
     }
 
-    // SỬA THÔNG TIN
+    // SỬA
     function editRecord(id) {
         const record = records.find(r => r.id === id); if (!record) return;
         
@@ -327,10 +383,10 @@
         document.getElementById('boxStatus').value = record.boxStatus;
         document.getElementById('parentStatus').value = record.parentStatus;
         document.getElementById('parentingRating').value = record.parentingRating;
-        document.getElementById('pairingDate').value = record.pairingDate;
-        document.getElementById('pairedBirds').value = record.pairedBirds;
-        document.getElementById('soldCount').value = record.soldCount;
-        document.getElementById('actualSoldDate').value = record.actualSoldDate;
+        document.getElementById('pairingDate').value = record.pairingDate || '';
+        document.getElementById('pairedBirds').value = record.pairedBirds || '';
+        document.getElementById('soldCount').value = record.soldCount || '';
+        document.getElementById('actualSoldDate').value = record.actualSoldDate || '';
         
         document.getElementById('transferFrom').value = record.transferFrom || '';
         document.getElementById('transferTo').value = record.transferTo || '';
@@ -338,27 +394,25 @@
         
         document.getElementById('deadDate').value = record.deadDate || '';
         document.getElementById('deadAge').value = record.deadAge || '';
-        document.getElementById('deadCount').value = record.deadCount || 0;
+        document.getElementById('deadCount').value = record.deadCount || '';
         document.getElementById('notes').value = record.notes || '';
 
-        // Khôi phục lịch sử đẻ
-        currentEggHistory = record.eggHistory || [];
+        currentEggHistory = record.eggHistory ? [...record.eggHistory] : [];
         renderEggHistoryUI();
-
-        // Tính lại các ngày tự động dựa trên ngày ghép
         calcDates(); 
+        calcHatchDate();
 
-        document.getElementById('formTitle').innerText = "✏️ Chỉnh Sửa Ô " + record.boxNumber;
-        document.getElementById('btnSave').innerText = "💾 CẬP NHẬT THAY ĐỔI";
+        document.getElementById('formTitle').innerText = "✏️ Sửa Ô " + record.boxNumber;
+        document.getElementById('btnSave').innerText = "💾 CẬP NHẬT";
         document.getElementById('btnSave').style.background = "#2196f3";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // XÓA THÔNG TIN
+    // XÓA
     function deleteRecord(id) {
-        if (confirm("Bạn có chắc chắn muốn xóa ô này không?")) {
+        if (confirm("Chắc chắn xóa ô này?")) {
             records = records.filter(r => r.id !== id);
-            localStorage.setItem('birdFarmData_v3', JSON.stringify(records));
+            localStorage.setItem('birdFarmData_v5', JSON.stringify(records));
             renderAll();
         }
     }
@@ -373,11 +427,13 @@
         document.getElementById('soldDateDisplay').value = "";
         document.getElementById('relayLayDateDisplay').value = "";
         document.getElementById('relayCountdown').value = "";
+        document.getElementById('hatchDateDisplay').value = "";
+        document.getElementById('nởDateDisplay').value = "";
         currentEggHistory = [];
         renderEggHistoryUI();
     }
 
-    // HIỂN THỊ BẢNG
+    // HIỂN THỊ BẢNG CHÍNH
     function renderTable() {
         const tbody = document.getElementById('tableBody'); 
         tbody.innerHTML = '';
@@ -389,68 +445,61 @@
         sorted.forEach(r => {
             const tr = document.createElement('tr');
             
-            // Cột 1: Số ô & Trạng thái
             let statusColor = r.boxStatus === 'Ô trống' ? 'bg-gray' : (r.boxStatus === 'Chờ đẻ' ? 'bg-yellow' : 'bg-green');
             let parentColor = r.parentStatus.includes('Chết') || r.parentStatus.includes('Bệnh') ? 'bg-red' : 'bg-green';
             
-            let html1 = `<td><strong style="font-size:15px; color:var(--primary);">${r.boxNumber}</strong><br>
+            let html1 = `<td><strong style="font-size:14px; color:var(--primary);">${r.boxNumber}</strong><br>
                         <span class="badge ${statusColor}">${r.boxStatus}</span><br>
                         <span class="badge ${parentColor}">${r.parentStatus}</span><br>
                         <span class="badge bg-blue">${r.parentingRating}</span></td>`;
 
-            // Cột 2: Lịch sử đẻ
             let eggHtml = `<td>`;
             if (r.eggHistory && r.eggHistory.length > 0) {
                 let totalEggs = r.eggHistory.reduce((sum, item) => sum + item.count, 0);
-                eggHtml += `<button onclick="showHistory(${r.id})" style="padding:3px 6px; font-size:11px; background:#ff9800; color:white; border:none; border-radius:3px; cursor:pointer; margin-bottom:3px;">Xem lịch sử (${r.eggHistory.length} lần)</button><br>`;
+                eggHtml += `<button onclick="showHistory(${r.id})" style="padding:2px 5px; font-size:10px; background:#ff9800; color:white; border:none; border-radius:3px; cursor:pointer; margin-bottom:2px;">Xem (${r.eggHistory.length} lần)</button><br>`;
                 eggHtml += `<span style="font-size:11px;">Tổng: <b>${totalEggs}</b> quả</span>`;
             } else {
-                eggHtml += `<span style="color:#999; font-size:11px;">Chưa có</span>`;
+                eggHtml += `<span style="color:#999; font-size:11px;">-</span>`;
             }
             eggHtml += `</td>`;
 
-            // Cột 3: Ghép con & Xuất bán
             let pairHtml = `<td style="font-size:11px;">`;
             if(r.pairingDate) {
-                pairHtml += `Ghép: ${formatDate(r.pairingDate)}<br>Số con: <b>${r.pairedBirds}</b><br>`;
-                pairHtml += `Dự kiến bán: <span style="color:#2e7d32; font-weight:bold;">${r.soldDate || '-'}</span><br>`;
-                if(r.soldCount > 0) pairHtml += `Thực tế: <b style="color:#1976d2">${r.soldCount} con</b> (${formatDate(r.actualSoldDate)})`;
+                pairHtml += `Ghép: ${formatDate(r.pairingDate)}<br>Con: <b>${r.pairedBirds}</b><br>`;
+                pairHtml += `Bán DK: <span style="color:#2e7d32; font-weight:bold;">${r.soldDate || '-'}</span><br>`;
+                if(r.soldCount > 0) pairHtml += `Bán TT: <b style="color:#1976d2">${r.soldCount}</b> (${formatDate(r.actualSoldDate)})`;
             } else {
-                pairHtml += `<span style="color:#999;">Chưa ghép</span>`;
+                pairHtml += `<span style="color:#999;">-</span>`;
             }
             pairHtml += `</td>`;
 
-            // Cột 4: Dự kiến đẻ lại
             let relayHtml = `<td style="font-size:11px;">`;
             if(r.pairingDate) {
                 relayHtml += `Đẻ lại: <span style="color:#c62828; font-weight:bold;">${r.relayLayDate || '-'}</span><br>`;
-                relayHtml += `<span style="color:${r.relayCountdown && r.relayCountdown.includes('quá') ? '#9e9e9e' : '#d32f2f'}">${r.relayCountdown || ''}</span>`;
+                relayHtml += `<span style="color:${r.relayCountdown && r.relayCountdown.includes('Quá') ? '#9e9e9e' : '#d32f2f'}">${r.relayCountdown || ''}</span>`;
             } else {
                 relayHtml += `<span style="color:#999;">-</span>`;
             }
             relayHtml += `</td>`;
 
-            // Cột 5: Chuyển tổ
             let transferHtml = `<td style="font-size:11px;">`;
             if(r.transferFrom || r.transferTo) {
                 transferHtml += `<span class="badge bg-orange">Đi: ${r.transferFrom || '?'}</span><br>`;
                 transferHtml += `<span class="badge bg-green">Đến: ${r.transferTo || '?'}</span><br>`;
                 transferHtml += `${formatDate(r.transferDate)}`;
             } else {
-                transferHtml += `<span style="color:#999;">Không</span>`;
+                transferHtml += `<span style="color:#999;">-</span>`;
             }
             transferHtml += `</td>`;
 
-            // Cột 6: Chết
             let deadHtml = `<td style="font-size:11px; color: ${r.deadCount > 0 ? 'red' : 'inherit'};">`;
             if(r.deadCount > 0) {
                 deadHtml += `SL: <b>${r.deadCount}</b><br>Ngày: ${formatDate(r.deadDate)}<br>Tuổi: ${r.deadAge}<br>${r.notes || ''}`;
             } else {
-                deadHtml += `<span style="color:#999;">Không</span>`;
+                deadHtml += `<span style="color:#999;">-</span>`;
             }
             deadHtml += `</td>`;
 
-            // Cột 7: Hành động
             let actionHtml = `<td><div class="action-btns">
                 <button class="btn-edit" onclick="editRecord(${r.id})">Sửa</button>
                 <button class="btn-delete" onclick="deleteRecord(${r.id})">Xóa</button>
@@ -461,45 +510,6 @@
         });
     }
 
-    // HIỂN THỊ DASHBOARD THỐNG KÊ
-    function renderStats() {
-        let totalBoxes = records.length;
-        let active = 0, waiting = 0, incubating = 0, empty = 0;
-        let deadMonth = 0, soldMonth = 0;
-        
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-
-        records.forEach(r => {
-            if(r.boxStatus === 'Đang hoạt động') active++;
-            if(r.boxStatus === 'Chờ đẻ') waiting++;
-            if(r.boxStatus === 'Đang ấp/Nuôi con') incubating++;
-            if(r.boxStatus === 'Ô trống') empty++;
-
-            if(r.deadDate && r.deadCount > 0) {
-                const d = new Date(r.deadDate);
-                if(d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                    deadMonth += r.deadCount;
-                }
-            }
-            if(r.actualSoldDate && r.soldCount > 0) {
-                const d = new Date(r.actualSoldDate);
-                if(d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                    soldMonth += r.soldCount;
-                }
-            }
-        });
-
-        document.getElementById('totalBoxes').innerText = totalBoxes;
-        document.getElementById('totalActive').innerText = active;
-        document.getElementById('totalWaiting').innerText = waiting;
-        document.getElementById('totalIncubating').innerText = incubating;
-        document.getElementById('totalEmpty').innerText = empty;
-        document.getElementById('totalDeadMonth').innerText = deadMonth;
-        document.getElementById('totalSoldMonth').innerText = soldMonth;
-    }
-
-    // HIỂN THỊ MODAL LỊCH SỬ ĐẺ
-    function showHistory(id) {
-        const r = records.find
+    // HIỂN THỊ BẢNG NHẮC GHÉP CON (MỚI)
+    function renderHatchSchedule() {
+        const tbody = document
