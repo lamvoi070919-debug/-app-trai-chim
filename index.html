@@ -29,7 +29,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.row input,.row select{max-width:220px}
 .barlist{display:grid;gap:9px}.barline{display:grid;grid-template-columns:90px 1fr 65px;gap:8px;align-items:center;font-size:13px}.bar{height:12px;background:#e9f0ea;border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:#35a45a;border-radius:20px}
 .notice{padding:11px 13px;border-radius:10px;background:#f0f7ff;border:1px solid #d5e7fa;color:#285b8d;font-size:13px;margin:10px 0}
-tr.due-yellow{background:#fff8e6}tr.due-red{background:#fff0ef}tr.due-green{background:#edf8ef}.due-pill{display:inline-block;padding:3px 7px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap}.due-pill.yellow{background:#fff0c2;color:#865500}.due-pill.red{background:#ffdedd;color:#a3201b}.due-pill.green{background:#dff2e3;color:#176b32}
 @media(max-width:900px){.layout{grid-template-columns:1fr}aside{padding:7px;position:sticky;top:58px;z-index:4}aside .brand{display:none}nav{display:flex;overflow:auto;gap:4px}nav button{white-space:nowrap;width:auto;margin:0;padding:9px 11px;font-size:13px}main{padding:13px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){header{padding:11px 13px}header strong{font-size:16px}.grid,.grid.two{grid-template-columns:1fr 1fr}form .fields{grid-template-columns:1fr 1fr}.card{padding:12px}.kpi b{font-size:23px}.hide-mobile{display:none}}
 #loginPanel{display:block;max-width:430px;margin:10vh auto;background:#fff;padding:22px;border:1px solid var(--line);border-radius:15px;box-shadow:0 3px 14px #153d2418}
@@ -67,12 +66,13 @@ tr.due-yellow{background:#fff8e6}tr.due-red{background:#fff0ef}tr.due-green{back
 </section>
 
 <section class="page" id="coops"><h1>Quản lý 1.800 ô</h1><p class="sub">Mỗi ô có mã cố định từ 001 đến 1800. Có thể tìm và cập nhật trạng thái ô.</p>
+<div class="card"><h2>Đánh giá chất lượng từng ô</h2><p class="hint">Nhập mã ô để tự tổng hợp trứng, số lượt ghép, chim sống/chết và lịch sử liên quan. Chỉ kết luận khi có đủ dữ liệu; số liệu tự cập nhật sau khi sửa hoặc xóa bản ghi.</p><div class="row"><input id="coopQualitySlot" inputmode="numeric" placeholder="Mã ô, ví dụ 001" oninput="renderCoopQuality()"><button type="button" class="secondary" onclick="renderCoopQuality()">Xem đánh giá</button></div><div id="coopQualityProfile"></div></div>
 <div class="card"><form id="coopForm"><div class="fields"><div><label>Mã ô</label><input id="coopId" placeholder="VD: 001" required></div><div><label>Trạng thái ô</label><select id="coopStatus"><option>Trống</option><option>Chờ đẻ</option><option>Đang ấp</option><option>Ấp và nuôi con</option></select></div><div><label>Tình trạng bố mẹ</label><select id="parentStatus"><option>Bình thường</option><option>Yếu</option><option>Đang theo dõi</option></select></div></div><div class="actions"><button>Lưu thông tin ô</button><button type="button" class="secondary" id="resetCoop">Đặt lại</button></div></form></div>
 <div class="card"><div class="row"><h2>Danh sách ô</h2><input id="coopSearch" placeholder="Tìm mã ô..." type="search"><select id="coopFilter"><option value="">Tất cả trạng thái</option><option>Đang ấp</option><option>Ấp và nuôi con</option><option>Trống</option><option>Chờ đẻ</option></select></div><div class="tablewrap"><table><thead><tr><th>Mã ô</th><th>Trạng thái</th><th>Bố mẹ</th><th>Thao tác</th></tr></thead><tbody id="coopRows"></tbody></table></div><p class="hint" id="coopCount"></p></div></section>
 
 <section class="page" id="incubation"><h1>Theo dõi tổ ấp</h1><p class="sub">Ghi nhận theo từng ngày; bấm ngày trong lịch sử để xem mã ô đang ấp và chuẩn bị ghép chim con.</p>
 <div class="card"><form id="incForm"><div class="fields"><div><label>Ngày thống kê</label><input type="date" id="incDate" required></div><div><label>Danh sách mã ô đang ấp</label><input id="incSlots" placeholder="001, 002, 015" required></div><div><label>Số tổ ấp</label><input id="incCount" type="number" min="0" placeholder="Tự đếm nếu để trống"></div></div><div><label>Ghi chú</label><input id="incNote" placeholder="Ghi chú (không bắt buộc)"></div><div class="actions"><button>Lưu thống kê ngày</button></div></form></div>
-<div class="card"><h2>Nhập số con ghép ngay tại tổ ấp</h2><p class="hint">Mỗi mã tổ có một ô nhập riêng. Lưu tại đây sẽ tự tạo/cập nhật lịch ghép theo từng tổ và hiện ngay trong Ghép con, Kho ghép con. Ngày ghép tự lấy ngày hôm nay.</p><div class="tablewrap"><table><thead><tr><th>Mã tổ đang ấp</th><th>Số con ghép</th><th>Ngày ghép</th><th>Nhắc lịch</th><th></th></tr></thead><tbody id="incPairInputRows"></tbody></table></div></div>
+<div class="card"><h2>Nhập số con ghép ngay tại tổ ấp</h2><p class="hint">Mỗi mã tổ có một ô nhập riêng. Lưu tại đây sẽ tự tạo/cập nhật lịch ghép theo từng tổ và hiện ngay trong Ghép con, Kho ghép con. Ngày ghép tự lấy ngày hôm nay.</p><div class="tablewrap"><table><thead><tr><th>Mã tổ đang ấp</th><th>Số con ghép</th><th>Ngày ghép</th><th></th></tr></thead><tbody id="incPairInputRows"></tbody></table></div></div>
 <div class="card"><h2>Bỏ ấp</h2><form id="dropIncForm"><div class="fields"><div><label>Ngày bỏ ấp</label><input type="date" id="dropIncDate" required></div><div><label>Mã ô bỏ ấp</label><input id="dropIncSlots" placeholder="001, 002, 015" required></div><div><label>Ghi chú</label><input id="dropIncNote" placeholder="Không bắt buộc"></div></div><div class="actions"><button type="submit" class="danger">Lưu bỏ ấp</button></div></form><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã ô bỏ ấp</th><th>Ghi chú</th><th></th></tr></thead><tbody id="dropIncRows"></tbody></table></div></div>
 <div class="card"><h2>Lịch sử tổ ấp</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Số tổ ấp</th><th>Danh sách ô</th><th>Ghi chú</th><th></th></tr></thead><tbody id="incRows"></tbody></table></div></div></section>
 
@@ -188,15 +188,16 @@ function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.togg
 $('nav').addEventListener('click',e=>{let b=e.target.closest('button[data-page]');if(b)page(b.dataset.page)});
 function byDate(list,d){return list.filter(x=>x.date===d)}
 function render(){
+ if($('coopQualitySlot')?.value)renderCoopQuality();
 const counts=Object.fromEntries(['Đang ấp','Ấp và nuôi con','Trống','Chờ đẻ'].map(s=>[s,db.coops.filter(c=>c.status===s).length]));
 $('kpis').innerHTML=[['Tổng số ô',db.coops.length],['Đang ấp',counts['Đang ấp']],['Ấp và nuôi con',counts['Ấp và nuôi con']],['Trống',counts['Trống']],['Chờ đẻ',counts['Chờ đẻ']]].map((x,i)=>`<button type="button" class="card kpi tap" onclick="openStatDetail('coop${i}')"><label>${x[0]}</label><b>${fmt(x[1])}</b><small>Bấm xem danh sách mã ô</small></button>`).join('');
-let d=$('incDay')?.value||today(), inc=db.incubations.find(x=>x.date===d), slots=inc?.slots||[];$('incSummary').textContent=inc?`${inc.count} tổ đang ấp ngày ${d}. Bấm ngày trong lịch sử ở mục Theo dõi tổ ấp để xem danh sách.`:`Chưa có dữ liệu tổ ấp cho ngày ${d}.`; $('incDayRows').innerHTML=slots.map(id=>{const reminder=slotReminder(id);return `<tr class="${reminder.cls}"><td><b>${esc(id)}</b></td><td><span class="pill">Đang ấp</span></td><td>${reminder.label!=='Chưa đến hạn'?`<span class="due-pill ${reminder.tone}">${reminder.label}</span>`:''}</td></tr>`}).join('');
+let d=$('incDay')?.value||today(), inc=db.incubations.find(x=>x.date===d), slots=inc?.slots||[];$('incSummary').textContent=inc?`${inc.count} tổ đang ấp ngày ${d}. Bấm ngày trong lịch sử ở mục Theo dõi tổ ấp để xem danh sách.`:`Chưa có dữ liệu tổ ấp cho ngày ${d}.`; $('incDayRows').innerHTML=slots.map(id=>`<tr><td>${esc(id)}</td><td><span class="pill">Đang ấp</span></td><td></td></tr>`).join('');
 let now=today(), ready=db.pairings.filter(p=>{let age=(new Date(now)-new Date(p.date))/86400000;return age>=25&&age<=30}), sell=db.pairings.filter(p=>{let age=(new Date(now)-new Date(p.date))/86400000;return age===30});
 $('forecastSummary').innerHTML=`<p><b>${ready.length}</b> đợt ghép trong khoảng bắt đầu bán (ngày 25–30) · <b>${fmt(sum(ready,'birds'))}</b> chim dự kiến</p><p><b>${sell.length}</b> đợt ghép đến mốc 30 ngày · <b>${fmt(sum(sell,'birds'))}</b> chim dự kiến</p>`;
 let m=monthNow(), eggs=db.eggs.filter(x=>(x.date1||'').startsWith(m)||(x.date2||'').startsWith(m)), pairs=db.pairings.filter(x=>x.date.startsWith(m)), chicks=db.chicks.filter(x=>x.date.startsWith(m));
 $('monthSummary').innerHTML=[['Trứng ghi nhận',sum(eggs,'count1')+sum(eggs,'count2'),'eggMonth'],['Tổ ghép',sum(pairs,'nests'),'pairMonth'],['Chim ghép',sum(pairs,'birds'),'pairMonth'],['Chim chết',sum(chicks,'dead'),'chickMonth']].map(x=>`<button type="button" class="card kpi tap" onclick="openStatDetail('${x[2]}')"><label>${x[0]}</label><b>${fmt(x[1])}</b><small>Bấm xem danh sách chi tiết</small></button>`).join('');
 // coops
-let q=($('coopSearch')?.value||'').toLowerCase(),f=$('coopFilter')?.value||'', filtered=db.coops.filter(c=>(!q||c.id.includes(q))&&(!f||c.status===f));$('coopRows').innerHTML=filtered.slice(0,250).map(c=>{const reminder=slotReminder(c.id);return `<tr class="${reminder.cls}" title="${esc(reminder.label)}"><td><b>${c.id}</b></td><td>${esc(c.status)}</td><td>${esc(c.parents)}</td><td>${reminder.label!=='Chưa đến hạn'?`<span class="due-pill ${reminder.tone}">${reminder.label}</span> `:''}<button class="secondary" onclick="editCoop('${c.id}')">Sửa</button></td></tr>`}).join('');$('coopCount').textContent=`Hiển thị ${Math.min(filtered.length,250)} / ${filtered.length} ô phù hợp.`;
+let q=($('coopSearch')?.value||'').toLowerCase(),f=$('coopFilter')?.value||'', filtered=db.coops.filter(c=>(!q||c.id.includes(q))&&(!f||c.status===f));$('coopRows').innerHTML=filtered.slice(0,250).map(c=>`<tr><td><b>${c.id}</b></td><td>${esc(c.status)}</td><td>${esc(c.parents)}</td><td><button class="secondary" onclick="editCoop('${c.id}')">Sửa</button></td></tr>`).join('');$('coopCount').textContent=`Hiển thị ${Math.min(filtered.length,250)} / ${filtered.length} ô phù hợp.`;
 renderIncPairInputs();
 $('incRows').innerHTML=[...db.incubations].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td><button class="secondary" onclick="showInc('${x.date}')">${x.date}</button></td><td>${fmt(x.count)}</td><td>${esc(x.slots.join(', '))}</td><td>${esc(x.note)}</td><td><button class="danger" onclick="del('incubations','${x.id}')">Xóa</button></td></tr>`).join('');
 $('dropIncRows').innerHTML=[...db.incubationDrops].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${esc(x.slots.join(', '))}</td><td>${esc(x.note||'')}</td><td><button class="danger" onclick="del('incubationDrops','${x.id}')">Xóa</button></td></tr>`).join('');
@@ -246,44 +247,27 @@ function openStatDetail(kind){
  if(kind==='chickMonth'){title='Lịch sử chim con trong tháng '+monthNow();rows=db.chicks.filter(x=>String(x.date||'').startsWith(monthNow())).sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${esc(x.slot||'—')}</td><td>${fmt(x.alive)}</td><td>${fmt(x.dead)}</td></tr>`);}
  el.style.display='block';let head=kind==='eggMonth'?'<th>Mã ô</th><th>Quả 1</th><th>Quả 2</th><th>Ghi chú</th>':kind==='pairMonth'?'<th>Ngày</th><th>Mã tổ</th><th>Số con</th><th>Ghi chú</th>':kind==='chickMonth'?'<th>Ngày</th><th>Mã tổ</th><th>Sống</th><th>Chết</th>':'<th>Mã ô</th><th>Trạng thái</th><th>Ghi chú</th>';el.innerHTML=`<div class="row"><b>${title}</b><button class="secondary miniAction" onclick="document.getElementById('statDetailPanel').style.display='none'">Đóng</button></div><div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.join('')||'<tr><td colspan="4">Không có dữ liệu</td></tr>'}</tbody></table></div>`;
 }
-function slotReminder(slot){
- const key=String(slot).padStart(3,'0'),todayStr=today();
- const starts=[...db.incubations].filter(r=>(r.slots||[]).some(x=>String(x).padStart(3,'0')===key)).map(r=>r.date).filter(Boolean).sort();
- const start=starts.find(d=>!(db.incubationDrops||[]).some(x=>x.date>=d&&(x.slots||[]).some(n=>String(n).padStart(3,'0')===key)));
- const pairs=db.pairings.filter(p=>(p.slots||[]).some(x=>String(x).padStart(3,'0')===key)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
- const pair=pairs[0];
- if(pair&&pair.date){const age=daysBetween(pair.date,todayStr);if(age>=5&&!pair.checkDay5Done)return {cls:'due-red',label:'Kiểm tra ngày 5',tone:'red'};if(age>=3&&!pair.checkDay3Done)return {cls:age>5?'due-red':'due-yellow',label:age>5?'Quá hạn kiểm tra':'Kiểm tra ngày 3',tone:age>5?'red':'yellow'};}
- if(start){const age=daysBetween(start,todayStr);if(age>=16&&age<=18)return {cls:age>=17?'due-red':'due-yellow',label:age>=17?'Đến ngày ghép':'Chuẩn bị ghép',tone:age>=17?'red':'yellow'};if(age>18)return {cls:'due-red',label:'Quá ngày ghép',tone:'red'};if(age>=14)return {cls:'due-yellow',label:'Sắp đến ngày ghép',tone:'yellow'};}
- return {cls:'',label:'Chưa đến hạn',tone:'green'};
-}
 function renderIncPairInputs(){
  const el=$('incPairInputRows');if(!el)return;
  const latest=[...db.incubations].sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
- const slots=[...new Set((latest?.slots||[]).map(x=>String(x).padStart(3,'0')))].filter(slot=>{
-  return !(db.incubationDrops||[]).some(d=>(d.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)&&String(d.date)>=String(latest?.date||''));
- }).sort((a,b)=>a.localeCompare(b));
- el.innerHTML=slots.map(slot=>{
-  const last=db.pairings.filter(p=>(p.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
-  const counts=last?pairingSlotCounts(last):{},val=Object.prototype.hasOwnProperty.call(counts,slot)?counts[slot]:'';
-  const reminder=slotReminder(slot);
-  return `<tr class="${reminder.cls}"><td><b>${esc(slot)}</b></td><td><input class="quickInput" id="incPairQty_${slot}" type="number" min="0" step="1" value="${val}" placeholder="Số con"></td><td>${last?.date||today()}</td><td><span class="due-pill ${reminder.tone}">${reminder.label}</span></td><td><button type="button" class="secondary miniAction" onclick="saveIncPairCount('${slot}')">${val!==''?'Cập nhật':'Lưu'}</button></td></tr>`;
- }).join('')||'<tr><td colspan="4">Không có tổ đang ấp trong lần ghi nhận mới nhất.</td></tr>';
+ const slots=(latest?.slots||[]).map(x=>String(x).padStart(3,'0')).filter(slot=>{let dropped=(db.incubationDrops||[]).some(d=>(d.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)&&String(d.date)>=String(latest?.date||''));let p=db.pairings.filter(p=>(p.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];return !dropped&&(!p||String(p.date)<String(latest?.date||''));}).sort((a,b)=>a.localeCompare(b));
+ el.innerHTML=slots.map(slot=>{let last=db.pairings.filter(p=>(p.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0],counts=last?pairingSlotCounts(last):{},val=Object.prototype.hasOwnProperty.call(counts,slot)?counts[slot]:'';return `<tr><td><b>${esc(slot)}</b></td><td><input class="quickInput" id="incPairQty_${slot}" type="number" min="0" step="1" value="${val}" placeholder="Số con"></td><td>${today()}</td><td><button type="button" class="secondary miniAction" onclick="saveIncPairCount('${slot}')">Lưu</button></td></tr>`}).join('')||'<tr><td colspan="4">Không có tổ đang ấp chờ ghép trong danh sách mới nhất.</td></tr>';
 }
 function saveIncPairCount(slot){
- const input=$('incPairQty_'+slot);if(!input||input.value===''){alert('Nhập số con ghép trước khi lưu.');return;}
- const birds=Number(input.value);if(!Number.isInteger(birds)||birds<0){alert('Số con phải là số nguyên không âm.');return;}
- const date=today();
- // Update an existing same-day record for this nest instead of creating a duplicate.
- let rec=db.pairings.find(p=>p.date===date&&(p.slots||[]).some(x=>String(x).padStart(3,'0')===slot));
- if(rec){
-  const slots=(rec.slots||[]).map(x=>String(x).padStart(3,'0'));
-  const counts=pairingSlotCounts(rec);counts[slot]=birds;
-  rec.slots=slots;rec.slotBirdCounts=counts;rec.nests=slots.length;rec.birds=Object.values(counts).reduce((n,v)=>n+Number(v||0),0);
-  rec.updatedAt=new Date().toISOString();rec.note=rec.note||'Cập nhật tại mục Tổ ấp';
- }else{
-  db.pairings.push({id:id(),date,nests:1,birds,slots:[slot],slotBirdCounts:{[slot]:birds},source:'incubationQuickEntry',updatedAt:new Date().toISOString(),note:'Nhập tại mục Tổ ấp'});
- }
- const coop=db.coops.find(c=>c.id===slot);if(coop)coop.status='Ấp và nuôi con';save();render();
+ const input=$('incPairQty_'+slot);if(!input||input.value===''){alert('Nhập số con ghép trước khi lưu.');return;}const birds=Number(input.value);if(!Number.isInteger(birds)||birds<0){alert('Số con phải là số nguyên không âm.');return;}
+ const date=today();let rec=db.pairings.find(p=>p.date===date&&(p.slots||[]).length===1&&String(p.slots[0]).padStart(3,'0')===slot&&p.source==='incubationQuickEntry');
+ if(rec){rec.birds=birds;rec.nests=1;rec.slotBirdCounts={[slot]:birds};rec.updatedAt=new Date().toISOString();rec.note=rec.note||'Nhập tại mục Tổ ấp';}
+ else db.pairings.push({id:id(),date,nests:1,birds,slots:[slot],slotBirdCounts:{[slot]:birds},source:'incubationQuickEntry',updatedAt:new Date().toISOString(),note:'Nhập tại mục Tổ ấp'});
+ const coop=db.coops.find(c=>c.id===slot);if(coop)coop.status='Ấp và nuôi con';save();render();alert('Đã cập nhật số con ghép tổ '+slot+' và đồng bộ sang Kho ghép con.');
+}
+function renderCoopQuality(){
+ const el=$('coopQualityProfile');if(!el)return;const raw=$('coopQualitySlot')?.value||'';if(!raw){el.innerHTML='<p class="muted">Nhập mã ô để xem đánh giá.</p>';return}const slot=String(Number(raw)).padStart(3,'0');if(!/^\d{3,4}$/.test(slot)||Number(slot)<1||Number(slot)>1800){el.innerHTML='<p>Mã ô không hợp lệ.</p>';return}
+ const eggRows=db.eggs.filter(x=>String(x.slot).padStart(3,'0')===slot),eggTotal=eggRows.reduce((n,x)=>n+Number(x.count1||0)+Number(x.count2||0),0);
+ const pairs=db.pairings.filter(p=>(p.slots||[]).some(x=>String(x).padStart(3,'0')===slot)).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ const chickRows=db.chicks.filter(x=>String(x.slot||x.nest||'').padStart(3,'0')===slot),alive=chickRows.reduce((n,x)=>n+Number(x.alive||0),0),dead=chickRows.reduce((n,x)=>n+Number(x.dead||0),0),known=alive+dead;
+ const incidents=(db.incidents||[]).filter(x=>String(x.slot||x.nest||'').padStart(3,'0')===slot),coop=db.coops.find(x=>x.id===slot),survival=known?Math.round(alive/known*100):null;
+ let verdict='Chưa đủ dữ liệu',tone='gold',reasons=[];if(pairs.length)reasons.push(`${pairs.length} lượt ghép`);if(eggTotal)reasons.push(`${eggTotal} trứng ghi nhận`);if(known){reasons.push(`${alive} sống / ${dead} chết (${survival}% sống)`);if(survival>=85){verdict='Tín hiệu tốt';tone='';}else if(survival>=70){verdict='Cần theo dõi';tone='gold';}else{verdict='Cần xem lại';tone='red';}}else reasons.push('Chưa có số sống/chết để tính tỷ lệ');if(incidents.length)reasons.push(`${incidents.length} sự cố đã ghi nhận`);
+ el.innerHTML=`<div class="stat"><div>Trứng ghi nhận<b>${fmt(eggTotal)}</b></div><div>Lượt ghép<b>${fmt(pairs.length)}</b></div><div>Chim sống<b>${fmt(alive)}</b></div><div>Chim chết<b>${fmt(dead)}</b></div></div><p>Ô <b>${slot}</b> · Trạng thái: ${esc(coop?.status||'Chưa có')} · Bố mẹ: ${esc(coop?.parents||'—')}</p><p><span class="pill ${tone}">${verdict}</span> ${survival===null?'':`· Tỷ lệ sống ${survival}%`}</p><p>${reasons.join(' · ')}</p><p class="hint">Đánh giá hiện tại chỉ dựa trên số liệu có cấu trúc đã ghi nhận. Chưa có dữ liệu trứng thụ tinh/nở và cân theo tuổi nên không tự suy đoán tỷ lệ nở hoặc tăng trưởng.</p><h3>Lịch sử trứng</h3>${eggRows.length?eggRows.map(x=>`<p>${esc(x.date1||x.date2||'')} · ${Number(x.count1||0)+Number(x.count2||0)} quả · ${esc(x.note||'')}</p>`).join(''):'<p>Chưa có dữ liệu trứng.</p>'}<h3>Lịch sử ghép con</h3>${pairs.length?pairs.map(x=>{let c=pairingSlotCounts(x);return `<p>${esc(x.date||'')} · ${Object.prototype.hasOwnProperty.call(c,slot)?fmt(c[slot])+' con':'Chưa tách số con'} · ${esc(x.note||'')}</p>`}).join(''):'<p>Chưa có lượt ghép.</p>'}`;
 }
 function renderPairingVault(){
  const rows=$('pairingVaultRows');if(!rows)return;
@@ -383,23 +367,7 @@ $('excelBtn').onclick=exportExcelWorkbook;
 $('exportBtn').onclick=()=>{let rows=[['Nhóm','Ngày','Mã ô/Thông tin','Số lượng','Chi tiết']];db.eggs.forEach(x=>rows.push(['Trứng',x.date1||x.date2,x.slot,+x.count1 + +x.count2,`Q1 ${x.date1}; Q2 ${x.date2}`]));(db.incidents||[]).forEach(x=>rows.push(['Sự cố',x.date,x.slot,x.count,`${x.type}; ${x.parents||''}; ${x.action||''}; ${x.note||''}`]));db.incubationDrops.forEach(x=>rows.push(['Bỏ ấp',x.date,x.slots.join(' '),x.slots.length,x.note||'']));db.pairings.forEach(x=>rows.push(['Ghép con',x.date,x.slots.join(' '),x.birds,`${x.nests} tổ`]));db.chicks.forEach(x=>rows.push(['Chim con',x.date,x.pairId,x.alive+x.dead,`Sống ${x.alive}; chết ${x.dead}; ${x.reason}`]));db.transfers.forEach(x=>rows.push(['Chuyển tổ',x.date,`${x.from} -> ${x.to}`,x.birds,x.note]));db.sales.forEach(x=>rows.push(['Bán',x.date,'Loại '+x.grade,x.qty,money(x.amount)]));db.manureSales.forEach(x=>rows.push(['Doanh thu phân chim',x.date,'Toàn trại','',money(x.amount)]));db.expenses.forEach(x=>rows.push(['Chi phí: '+x.category,x.date,x.name,x.qty,`${x.unit}; đơn giá ${x.price}; thành tiền ${x.amount}; ${x.note}`]));download('bao-cao-trai-chim.csv','\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n'),'text/csv;charset=utf-8')};
 $('backupBtn').onclick=()=>download('sao-luu-trai-chim-'+today()+'.json',JSON.stringify(db,null,2),'application/json');
 $('restoreFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x.coops||!x.sales)throw 0;x.expenses=x.expenses||[];x.manureSales=x.manureSales||[];if(confirm('Khôi phục sẽ thay thế dữ liệu hiện tại. Tiếp tục?')){db=normalizeDb(x);save();alert('Đã khôi phục dữ liệu.')}}catch(_){alert('Tệp sao lưu không hợp lệ.')}};
-$('clearBtn').onclick=async()=>{
- // Chủ trại đã yêu cầu xóa ngay: giữ nguyên 1.800 mã ô, chỉ xóa lịch sử nghiệp vụ.
- if(!cloudReady||!currentUser||!cloudRef||!thaoMirrorRef){alert('Chưa kết nối Firebase đầy đủ. Hãy đăng nhập và chờ trạng thái Đã đồng bộ rồi mới xóa để tránh lịch sử cũ còn trên máy chủ.');return;}
- const oldText=$('clearBtn').textContent;$('clearBtn').disabled=true;$('clearBtn').textContent='ĐANG LÀM TRỐNG...';
- try{
-  await saveQueue;
-  db=blank();
-  const snapshot=JSON.parse(JSON.stringify(db));
-  const emptyThao={eggs:[],nests:[],pairs:[],chicks:[],moves:[],drops:[],tasks:[],reports:[],nestApprovals:[],coopNotes:[]};
-  const stamp=new Date().toISOString();
-  await firestore.setDoc(cloudRef,{farmDB:snapshot,updatedAt:stamp});
-  await firestore.setDoc(thaoMirrorRef,{mainDB:makeMainMirror(snapshot),thaoDB:emptyThao,historyResetAt:stamp,mainDBUpdatedAt:stamp},{merge:true});
-  localStorage.setItem(localKey,JSON.stringify(snapshot));
-  render();setSync('☁️ Firebase xác nhận đã làm trống lịch sử App chính và App Thảo; giữ nguyên 1.800 mã ô.');
- }catch(e){setSync('Lỗi khi xóa lịch sử trên Firebase: '+friendlyError(e));alert('Firebase chưa xác nhận xóa xong. Không nên nhập dữ liệu mới cho đến khi kiểm tra lại trạng thái đồng bộ. Chi tiết: '+friendlyError(e));console.error(e)}
- finally{$('clearBtn').disabled=false;$('clearBtn').textContent=oldText;}
-};
+$('clearBtn').onclick=()=>{if(confirm('Bạn chắc chắn muốn xóa toàn bộ dữ liệu đã nhập? Hãy tải sao lưu trước.')){db=blank();save()}};
 setDefaults();render();
 
 function friendlyError(e){
