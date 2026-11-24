@@ -31,7 +31,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 .notice{padding:11px 13px;border-radius:10px;background:#f0f7ff;border:1px solid #d5e7fa;color:#285b8d;font-size:13px;margin:10px 0}
 @media(max-width:900px){.layout{grid-template-columns:1fr}aside{padding:7px;position:sticky;top:58px;z-index:4}aside .brand{display:none}nav{display:flex;overflow:auto;gap:4px}nav button{white-space:nowrap;width:auto;margin:0;padding:9px 11px;font-size:13px}main{padding:13px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){header{padding:11px 13px}header strong{font-size:16px}.grid,.grid.two{grid-template-columns:1fr 1fr}form .fields{grid-template-columns:1fr 1fr}.card{padding:12px}.kpi b{font-size:23px}.hide-mobile{display:none}}
-#loginPanel{display:none;max-width:430px;margin:10vh auto;background:#fff;padding:22px;border:1px solid var(--line);border-radius:15px;box-shadow:0 3px 14px #153d2418}
+#loginPanel{display:block;max-width:430px;margin:10vh auto;background:#fff;padding:22px;border:1px solid var(--line);border-radius:15px;box-shadow:0 3px 14px #153d2418}
 #loginPanel input{margin:5px 0 12px}#loginMessage{font-size:13px;color:#a12d25;overflow-wrap:anywhere;min-height:20px}
 #syncStatus{font-size:12px;color:var(--muted);margin-left:10px}
 #mainApp{display:none}
@@ -62,7 +62,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 <div class="card"><h2>🐣 Dự kiến chim bán</h2><div id="forecastSummary"></div><div class="notice">Ngày bắt đầu bán dự kiến = ngày ghép + 25 ngày; hạn bán muộn nhất = ngày ghép + 30 ngày.</div></div>
 </div>
 <div class="card"><h2>📈 Sản lượng tháng hiện tại</h2><div id="monthSummary" class="grid"></div></div>
-<div class="card"><h2>🔄 Dữ liệu nhận từ app Thảo</h2><p class="muted">Thông tin nhân viên cập nhật được nhận trực tiếp từ Firebase. Dữ liệu gốc của app chính vẫn được giữ riêng, không bị ghi đè.</p><div id="thaoSyncSummary"><p class="muted">Đang chờ dữ liệu app Thảo...</p></div><p class="hint" id="thaoUpdated">Chưa có dữ liệu cập nhật.</p><h3>Trứng Thảo mới ghi nhận</h3><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã tổ</th><th>Số quả</th><th>Ghi chú</th></tr></thead><tbody id="thaoEggRows"><tr><td colspan="4">Chưa có dữ liệu.</td></tr></tbody></table></div></div>
 </section>
 
 <section class="page" id="coops"><h1>Quản lý 1.800 ô</h1><p class="sub">Mỗi ô có mã cố định từ 001 đến 1800. Có thể tìm và cập nhật trạng thái ô.</p>
@@ -82,6 +81,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 <div class="card"><form id="eggForm"><div class="fields"><div><label>Mã ô</label><input id="eggSlot" required placeholder="001"></div><div><label>Ngày đẻ quả 1</label><input id="egg1Date" type="date"></div><div><label>Ngày đẻ quả 2</label><input id="egg2Date" type="date"></div><div><label>Số trứng quả 1</label><input id="egg1Count" type="number" min="0" value="1"></div><div><label>Số trứng quả 2</label><input id="egg2Count" type="number" min="0" value="1"></div><div><label>Ghi chú</label><input id="eggNote"></div></div><div class="actions"><button>Lưu lần đẻ</button></div></form></div>
 <div class="card"><h2>📷 Chụp ảnh trứng nhặt</h2><form id="eggPhotoForm"><div class="fields"><div><label>Ngày nhặt</label><input id="photoEggDate" type="date" required></div><div><label>Số trứng kiểm tra từ ảnh</label><input id="photoEggCount" type="number" min="0" required placeholder="Nhập số lượng sau khi kiểm tra"></div><div><label>Ghi chú</label><input id="photoEggNote" placeholder="Không bắt buộc"></div></div><div style="margin-top:10px"><label>Chụp ảnh / chọn ảnh trứng</label><input id="eggPhotoFile" type="file" accept="image/*" capture="environment"><img id="eggPhotoPreview" alt="Ảnh trứng vừa chụp" style="display:none;max-width:100%;max-height:230px;object-fit:contain;margin-top:10px;border-radius:10px"></div><p class="notice">Ảnh chỉ hiển thị tạm thời trên iPhone để đối chiếu, không tải lên Firebase và không lưu trong dữ liệu sao lưu. Chỉ ngày, số lượng bạn xác nhận và ghi chú được lưu. Bản này chưa có dịch vụ AI tự đếm; vui lòng kiểm tra ảnh rồi nhập số lượng chính xác.</p><div class="actions"><button type="submit">Lưu số trứng từ ảnh</button></div></form><div id="eggPhotoTotals" class="notice"></div></div>
 <div class="card"><div class="row"><h2>Thống kê trứng theo tháng</h2><input id="eggMonth" type="month"></div><div id="eggTotals" class="notice"></div><div class="tablewrap"><table><thead><tr><th>Mã ô</th><th>Ngày quả 1</th><th>SL quả 1</th><th>Ngày quả 2</th><th>SL quả 2</th><th>Tổng</th></tr></thead><tbody id="eggRows"></tbody></table></div></div></section>
+
 <section class="page" id="pairing"><h1>Ghép chim con lên ổ</h1><p class="sub">Ghi ngày ghép, số tổ và số chim. Dữ liệu này làm căn cứ dự kiến bán.</p>
 <div class="card"><form id="pairForm"><div class="fields"><div><label>Ngày ghép</label><input id="pairDate" type="date" required></div><div><label>Số tổ ghép</label><input id="pairNests" type="number" min="0" required></div><div><label>Số chim ghép</label><input id="pairBirds" type="number" min="0" required></div><div><label>Mã ô (cách nhau bằng dấu phẩy)</label><input id="pairSlots" placeholder="001,002"></div><div><label>Ghi chú</label><input id="pairNote"></div></div><div class="actions"><button>Lưu lần ghép</button></div></form></div>
 <div class="card"><h2>Lịch sử ghép con</h2><div class="tablewrap"><table><thead><tr><th>Ngày ghép</th><th>Số tổ</th><th>Số chim</th><th>Mã ô</th><th>Ghi chú</th></tr></thead><tbody id="pairRows"></tbody></table></div></div></section>
@@ -140,7 +140,6 @@ const $=id=>document.getElementById(id), today=()=>new Date().toISOString().slic
 const blank=()=>({coops:Array.from({length:1800},(_,i)=>({id:String(i+1).padStart(3,'0'),status:'Trống',parents:'Bình thường'})),incubations:[],incubationDrops:[],raisingProfiles:[],eggPhotoLogs:[],eggs:[],pairings:[],chicks:[],transfers:[],sales:[],expenses:[],manureSales:[],prices:{1:170000,2:150000,3:130000}});
 let db=blank();
 let auth=null, authApi=null, firestore=null, currentUser=null, cloudReady=false, cloudRef=null;
-let bridgeRef=null, bridgeUnsubscribe=null, thaoData=null;
 let saveQueue=Promise.resolve(), localKey='pigeonFarmDB';
 function normalizeDb(value){
  const base=blank(); if(!value||typeof value!=='object')return base;
@@ -150,64 +149,14 @@ function normalizeDb(value){
  return base;
 }
 try{db=normalizeDb(JSON.parse(localStorage.getItem('pigeonFarmDB')||'null'))}catch(e){db=blank()}
-function makeMainMirror(snapshot){
- return {
-  coops:snapshot.coops,incubations:snapshot.incubations,incubationDrops:snapshot.incubationDrops,
-  raisingProfiles:snapshot.raisingProfiles,eggs:snapshot.eggs,pairings:snapshot.pairings,
-  chicks:snapshot.chicks,transfers:snapshot.transfers,sales:snapshot.sales,
-  expenses:snapshot.expenses,manureSales:snapshot.manureSales,prices:snapshot.prices,
-  updatedAt:new Date().toISOString()
- };
-}
-async function publishMainMirror(snapshot){
- if(!bridgeRef)return;
- await firestore.setDoc(bridgeRef,{mainDB:makeMainMirror(snapshot),mainUpdatedAt:new Date().toISOString()},{merge:true});
-}
 function save(){
  if(!db||!Array.isArray(db.coops))return Promise.reject(new Error('Dữ liệu không hợp lệ; đã dừng lưu để bảo vệ dữ liệu.'));
  const snapshot=JSON.parse(JSON.stringify(db));
  try{localStorage.setItem(localKey,JSON.stringify(snapshot));}catch(e){setSync('Không lưu được bộ nhớ iPhone: '+e.message);}
  render();
  if(!cloudReady||!currentUser||!cloudRef){setSync('Chưa kết nối Firebase — dữ liệu tạm lưu trên iPhone.');return Promise.resolve();}
- saveQueue=saveQueue.then(async()=>{
-  await firestore.setDoc(cloudRef,{farmDB:snapshot,updatedAt:new Date().toISOString()},{merge:true});
-  await publishMainMirror(snapshot);
-  setSync('☁️ Đã đồng bộ app chính và gửi dữ liệu sang app Thảo lúc '+new Date().toLocaleTimeString('vi-VN'));
- }).catch(e=>{setSync('Lỗi đồng bộ: '+friendlyError(e)+' · dữ liệu vẫn còn trên iPhone');console.error(e);});
+ saveQueue=saveQueue.then(()=>firestore.setDoc(cloudRef,{farmDB:snapshot,updatedAt:new Date().toISOString()})).then(()=>setSync('☁️ Đã đồng bộ Firebase lúc '+new Date().toLocaleTimeString('vi-VN'))).catch(e=>{setSync('Lỗi đồng bộ: '+friendlyError(e)+' · dữ liệu vẫn còn trên iPhone');console.error(e);});
  return saveQueue;
-}
-function renderThaoSync(){
- const box=$('thaoSyncSummary'); if(!box)return;
- if(!thaoData){box.innerHTML='<p class="muted">Chưa nhận dữ liệu từ app Thảo. Hãy kiểm tra app Thảo đã kết nối Firebase.</p>';return;}
- const d=thaoData;
- const eggs=Array.isArray(d.eggs)?d.eggs:[], nests=Array.isArray(d.nests)?d.nests:[], pairs=Array.isArray(d.pairs)?d.pairs:[], chicks=Array.isArray(d.chicks)?d.chicks:[], moves=Array.isArray(d.moves)?d.moves:[], drops=Array.isArray(d.drops)?d.drops:[];
- const eggCount=eggs.reduce((n,x)=>n+Number(x.count||1),0);
- const activeNests=nests.filter(x=>x.active!==false).length;
- box.innerHTML=`<div class="grid"><div class="card kpi"><label>Lượt ghi trứng</label><b>${fmt(eggs.length)}</b><small>${fmt(eggCount)} quả</small></div><div class="card kpi"><label>Tổ đang ấp</label><b>${fmt(activeNests)}</b></div><div class="card kpi"><label>Lượt ghép đôi</label><b>${fmt(pairs.length)}</b></div><div class="card kpi"><label>Lượt giao nuôi</label><b>${fmt(chicks.length)}</b></div><div class="card kpi"><label>Lượt chuyển tổ</label><b>${fmt(moves.length)}</b></div><div class="card kpi"><label>Lượt bỏ ấp</label><b>${fmt(drops.length)}</b></div></div>`;
- const latest=[...eggs].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,8);
- const rows=latest.map(x=>`<tr><td>${esc(x.date||'')}</td><td>${esc(String(x.nest??'').padStart(3,'0'))}</td><td>${fmt(x.count||1)}</td><td>${esc(x.note||'')}</td></tr>`).join('');
- const table=$('thaoEggRows'); if(table)table.innerHTML=rows||'<tr><td colspan="4">Chưa có bản ghi trứng.</td></tr>';
- const stamp=$('thaoUpdated'); if(stamp)stamp.textContent='Cập nhật từ app Thảo: '+(d.updatedAt||'đã nhận dữ liệu Firebase');
-}
-function setSync(message){const el=$('syncStatus');if(el)el.textContent=message;} saveQueue=saveQueue.then(async()=>{
-  await firestore.setDoc(cloudRef,{farmDB:snapshot,updatedAt:new Date().toISOString()},{merge:true});
-  await publishMainMirror(snapshot);
-  setSync('☁️ Đã đồng bộ app chính và gửi dữ liệu sang app Thảo lúc '+new Date().toLocaleTimeString('vi-VN'));
- }).catch(e=>{setSync('Lỗi đồng bộ: '+friendlyError(e)+' · dữ liệu vẫn còn trên iPhone');console.error(e);});
- return saveQueue;
-}
-function renderThaoSync(){
- const box=$('thaoSyncSummary'); if(!box)return;
- if(!thaoData){box.innerHTML='<p class="muted">Chưa nhận dữ liệu từ app Thảo. Hãy kiểm tra app Thảo đã kết nối Firebase.</p>';return;}
- const d=thaoData;
- const eggs=Array.isArray(d.eggs)?d.eggs:[], nests=Array.isArray(d.nests)?d.nests:[], pairs=Array.isArray(d.pairs)?d.pairs:[], chicks=Array.isArray(d.chicks)?d.chicks:[], moves=Array.isArray(d.moves)?d.moves:[], drops=Array.isArray(d.drops)?d.drops:[];
- const eggCount=eggs.reduce((n,x)=>n+Number(x.count||1),0);
- const activeNests=nests.filter(x=>x.active!==false).length;
- box.innerHTML=`<div class="grid"><div class="card kpi"><label>Lượt ghi trứng</label><b>${fmt(eggs.length)}</b><small>${fmt(eggCount)} quả</small></div><div class="card kpi"><label>Tổ đang ấp</label><b>${fmt(activeNests)}</b></div><div class="card kpi"><label>Lượt ghép đôi</label><b>${fmt(pairs.length)}</b></div><div class="card kpi"><label>Lượt giao nuôi</label><b>${fmt(chicks.length)}</b></div><div class="card kpi"><label>Lượt chuyển tổ</label><b>${fmt(moves.length)}</b></div><div class="card kpi"><label>Lượt bỏ ấp</label><b>${fmt(drops.length)}</b></div></div>`;
- const latest=[...eggs].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,8);
- const rows=latest.map(x=>`<tr><td>${esc(x.date||'')}</td><td>${esc(String(x.nest??'').padStart(3,'0'))}</td><td>${fmt(x.count||1)}</td><td>${esc(x.note||'')}</td></tr>`).join('');
- const table=$('thaoEggRows'); if(table)table.innerHTML=rows||'<tr><td colspan="4">Chưa có bản ghi trứng.</td></tr>';
- const stamp=$('thaoUpdated'); if(stamp)stamp.textContent='Cập nhật từ app Thảo: '+(d.updatedAt||'đã nhận dữ liệu Firebase');
 }
 function setSync(message){const el=$('syncStatus');if(el)el.textContent=message;}
 function dateIn(d,a,b){return d>=a&&d<=b}
@@ -252,7 +201,6 @@ $('expenseCategoryRows').innerHTML=categories.map(cat=>{let list=xr.filter(x=>x.
 $('expenseCount').textContent=`${xr.length} khoản trong tháng ${xm}`;
 $('expenseRows').innerHTML=[...xr].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${esc(x.category)}</td><td>${esc(x.name)}${x.vendor?' · '+esc(x.vendor):''}</td><td>${fmt(x.qty)} ${esc(x.unit)}</td><td>${money(x.price)}</td><td><b>${money(x.amount)}</b></td><td>${esc(x.note)}</td><td><button class="danger" onclick="del('expenses','${x.id}')">Xóa</button></td></tr>`).join('');
 renderReports();
-renderThaoSync();
 }
 function forecastHtml(list){return list.length?`<div class="notice">${list.map(p=>`<p><b>${p.date}</b> · ${p.nests} tổ · ${fmt(p.birds)} con · ${p.slots.join(', ')||'Chưa gắn mã ô'}</p>`).join('')}</div>`:'<p class="muted">Chưa có đợt ghép trong khoảng ngày này.</p>'}
 function showInc(d){$('incDay').value=d;$('incSummary').textContent='Đang xem danh sách ô của ngày '+d;let x=db.incubations.find(i=>i.date===d);$('incDayRows').innerHTML=(x?.slots||[]).map(id=>`<tr><td>${id}</td><td><span class="pill">Đang ấp</span></td><td></td></tr>`).join('');page('overview')}
@@ -262,7 +210,8 @@ function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,
 $('coopForm').onsubmit=e=>{e.preventDefault();let idv=$('coopId').value.trim().padStart(3,'0'),c=db.coops.find(x=>x.id===idv);if(!c)return alert('Mã ô phải từ 001 đến 1800.');c.status=$('coopStatus').value;c.parents=$('parentStatus').value;save();e.target.reset()};
 $('resetCoop').onclick=()=>$('coopForm').reset();$('coopSearch').oninput=render;$('coopFilter').onchange=render;$('incDay').onchange=render;
 $('incForm').onsubmit=e=>{e.preventDefault();let date=$('incDate').value,slots=parseList($('incSlots').value);let count=+$('incCount').value||slots.length;let rec={id:id(),date,slots,count,note:$('incNote').value};let old=db.incubations.findIndex(x=>x.date===date);if(old>=0)db.incubations[old]=rec;else db.incubations.push(rec);slots.forEach(s=>{let c=db.coops.find(x=>x.id===s.padStart(3,'0'));if(c)c.status='Đang ấp'});save();e.target.reset();setDefaults()};
-$('dropIncForm').onsubmit=e=>{e.preventDefault();let slots=parseList($('dropIncSlots').value).map(x=>x.padStart(3,'0'));db.incubationDrops.push({id:id(),date:$('dropIncDate').value,slots,note:$('dropIncNote').value.trim()});slots.forEach(slot=>{let c=db.coops.find(x=>x.id===slot);if(c&&c.status==='Đang ấp')c.status='Trống'});save();e.target.reset();setDefaults()}; $('raisingForm').onsubmit=e=>{e.preventDefault();let slot=$('raisingSlot').value.trim().padStart(3,'0');if(!db.coops.some(c=>c.id===slot))return alert('Mã ô phải từ 001 đến 1800.');let rec={slot,quality:$('raisingQuality').value,note:$('raisingNote').value.trim()};let i=db.raisingProfiles.findIndex(x=>x.slot===slot);if(i>=0)db.raisingProfiles[i]=rec;else db.raisingProfiles.push(rec);save();e.target.reset()};
+$('dropIncForm').onsubmit=e=>{e.preventDefault();let slots=parseList($('dropIncSlots').value).map(x=>x.padStart(3,'0'));db.incubationDrops.push({id:id(),date:$('dropIncDate').value,slots,note:$('dropIncNote').value.trim()});slots.forEach(slot=>{let c=db.coops.find(x=>x.id===slot);if(c&&c.status==='Đang ấp')c.status='Trống'});save();e.target.reset();setDefaults()};
+$('raisingForm').onsubmit=e=>{e.preventDefault();let slot=$('raisingSlot').value.trim().padStart(3,'0');if(!db.coops.some(c=>c.id===slot))return alert('Mã ô phải từ 001 đến 1800.');let rec={slot,quality:$('raisingQuality').value,note:$('raisingNote').value.trim()};let i=db.raisingProfiles.findIndex(x=>x.slot===slot);if(i>=0)db.raisingProfiles[i]=rec;else db.raisingProfiles.push(rec);save();e.target.reset()};
 $('eggPhotoFile').onchange=e=>{let f=e.target.files[0],img=$('eggPhotoPreview');if(!f){img.style.display='none';img.removeAttribute('src');return}let reader=new FileReader();reader.onload=()=>{img.src=reader.result;img.style.display='block'};reader.readAsDataURL(f)};
 $('eggPhotoForm').onsubmit=e=>{e.preventDefault();db.eggPhotoLogs.push({id:id(),date:$('photoEggDate').value,count:+$('photoEggCount').value,note:$('photoEggNote').value.trim(),method:'photo-confirmed'});save();e.target.reset();$('eggPhotoPreview').style.display='none';$('eggPhotoPreview').removeAttribute('src');setDefaults()};
 $('eggForm').onsubmit=e=>{e.preventDefault();db.eggs.push({id:id(),slot:$('eggSlot').value.trim().padStart(3,'0'),date1:$('egg1Date').value,date2:$('egg2Date').value,count1:+$('egg1Count').value||0,count2:+$('egg2Count').value||0,note:$('eggNote').value});save();e.target.reset();setDefaults()};
@@ -347,15 +296,7 @@ async function startFirebase(){
    localKey='pigeonFarmDB_'+user.uid;
    const database=storeMod.getFirestore(firebaseApp);
    cloudRef=storeMod.doc(database,'users',user.uid,'farmData','complete');
-   bridgeRef=storeMod.doc(database,'users','1ePS2ZPFVpVyErE3L81CzJT6kPb2','farmData','appThaoV1');
    firestore={...storeMod,db:database};
-   if(bridgeUnsubscribe){bridgeUnsubscribe();bridgeUnsubscribe=null;}
-   bridgeUnsubscribe=storeMod.onSnapshot(bridgeRef,bridgeSnap=>{
-    if(!bridgeSnap.exists()){thaoData=null;renderThaoSync();return;}
-    const bridge=bridgeSnap.data()||{};
-    thaoData=bridge.thaoDB&&typeof bridge.thaoDB==='object'?bridge.thaoDB:bridge;
-    renderThaoSync();
-   },err=>{console.error('Lỗi nhận dữ liệu app Thảo:',err);setSync('Không đọc được dữ liệu app Thảo: '+friendlyError(err));});
    try{
     const snap=await storeMod.getDoc(cloudRef);
     if(snap.exists()){
@@ -372,8 +313,6 @@ async function startFirebase(){
      localStorage.setItem(localKey,JSON.stringify(db));
     }
     cloudReady=true;render();
-    try{await publishMainMirror(db);setSync('☁️ App chính đã kết nối và chia sẻ dữ liệu với app Thảo.');}
-    catch(bridgeError){setSync('App chính đã tải dữ liệu nhưng chưa gửi được sang app Thảo: '+friendlyError(bridgeError));console.error(bridgeError);}
    }catch(e){cloudReady=false;setSync('Không tải được dữ liệu: '+friendlyError(e));alert('Không tải được dữ liệu Firebase. Ứng dụng tạm khóa đồng bộ để tránh ghi đè dữ liệu cũ. Chi tiết: '+friendlyError(e));}
   });
  }catch(e){$('loginPanel').style.display='block';$('mainApp').style.display='none';$('loginMessage').textContent='Không khởi tạo được Firebase: '+friendlyError(e);console.error(e)}
