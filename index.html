@@ -51,7 +51,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 <header><div><strong>🐦 TRẠI CHIM CÂU</strong><br><small>Hệ thống quản lý 1.800 ô</small></div><div style="text-align:right"><small id="today"></small><br><small id="syncStatus">Đang kết nối...</small> <button type="button" class="secondary" style="padding:5px 8px;font-size:11px" onclick="logout()">Đăng xuất</button></div></header>
 <div class="layout">
 <aside><div class="brand">🐦 Trại chim câu<br><small>Quản lý khoa học</small></div><nav id="nav">
-<button class="active" data-page="overview">⌂ Tổng quan</button><button data-page="coops">▦ Quản lý ô</button><button data-page="incubation">🥚 Theo dõi tổ ấp</button><button data-page="raising">🐣 Ưu tiên nuôi con</button><button data-page="eggs">◉ Theo dõi trứng</button><button data-page="pairing">♡ Ghép con</button><button data-page="chicks">🐣 Chim con</button><button data-page="transfers">⇄ Chuyển tổ</button><button data-page="sales">▣ Chim bán</button><button data-page="expenses">💸 Chi phí</button><button data-page="reports">▥ Thống kê</button><button data-page="settings">⚙ Cài đặt</button>
+<button class="active" data-page="overview">⌂ Tổng quan</button><button data-page="coops">▦ Quản lý ô</button><button data-page="incubation">🥚 Theo dõi tổ ấp</button><button data-page="raising">🐣 Ưu tiên nuôi con</button><button data-page="eggs">◉ Theo dõi trứng</button><button data-page="pairing">♡ Ghép con</button><button data-page="chicks">🐣 Chim con</button><button data-page="transfers">⇄ Chuyển tổ</button><button data-page="sales">▣ Chim bán</button><button data-page="expenses">💸 Chi phí</button><button data-page="reports">▥ Thống kê</button><button data-page="thaoData">📲 Dữ liệu app Thảo</button><button data-page="settings">⚙ Cài đặt</button>
 </nav></aside>
 <main>
 <section class="page active" id="overview">
@@ -132,7 +132,9 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 <div class="card"><h2>Biểu đồ theo tháng trong năm</h2><div id="chart" class="barlist"></div><p class="hint">Biểu đồ hiển thị trứng, chim ghép, chim sống và chim bán theo dữ liệu đã lưu.</p></div>
 <div class="card"><h2>Xuất dữ liệu</h2><p class="muted">Tải bản CSV để mở bằng Excel. Nên sao lưu dữ liệu định kỳ.</p><div class="actions"><button id="exportBtn">Tải báo cáo CSV</button><button class="secondary" id="backupBtn">Sao lưu toàn bộ dữ liệu JSON</button><label class="btn secondary" style="display:inline-flex;align-items:center">Khôi phục JSON<input type="file" id="restoreFile" accept=".json,application/json" style="display:none"></label></div></div></section>
 
-<section class="page" id="settings"><h1>Cài đặt & dữ liệu</h1><p class="sub">Cấu hình quy mô trại và quản lý dữ liệu lưu trên thiết bị này.</p><div class="card"><h2>Quy mô trại</h2><p>Hệ thống khởi tạo sẵn 1.800 mã ô từ 001 đến 1800.</p><p class="notice">Dữ liệu hiện lưu trong bộ nhớ trình duyệt (localStorage) trên thiết bị đang sử dụng. Hãy sao lưu JSON định kỳ và không xóa dữ liệu trình duyệt nếu chưa sao lưu.</p><button class="danger" id="clearBtn">Xóa toàn bộ dữ liệu đã nhập và khởi tạo lại 1.800 ô</button></div></section>
+<section class="page" id="thaoData"><h1>Dữ liệu từ app Thảo</h1><p class="sub">Dữ liệu được đọc trực tiếp từ Firebase theo thời gian thực. Khu vực này chỉ xem, không ghi đè dữ liệu trại chim chính.</p><div class="card"><div class="row"><h2>Trạng thái kết nối app Thảo</h2><span class="pill" id="thaoCloudStatus">Đang chờ kết nối...</span></div><p id="thaoCloudUpdated" class="muted">Chưa nhận dữ liệu.</p><div id="thaoKpis" class="grid"></div></div><div class="card"><h2>🥚 Trứng ghi nhận</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã tổ</th><th>Số quả</th><th>Ghi chú</th></tr></thead><tbody id="thaoEggRows"></tbody></table></div></div><div class="card"><h2>🐣 Tổ ấp</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã tổ</th><th>Trạng thái</th><th>Ưu tiên</th><th>Đánh giá</th><th>Ghi chú</th></tr></thead><tbody id="thaoNestRows"></tbody></table></div></div><div class="card"><h2>❤️ Ghép đôi</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã tổ</th><th>Trống</th><th>Mái</th><th>Ghi chú</th></tr></thead><tbody id="thaoPairRows"></tbody></table></div></div><div class="card"><h2>🐥 Giao nuôi con</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Tổ nhận</th><th>Số chim</th><th>Đánh giá</th><th>Ghi chú</th></tr></thead><tbody id="thaoChickRows"></tbody></table></div></div><div class="card"><h2>🔄 Chuyển tổ</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Tổ cũ</th><th>Tổ mới</th><th>Số chim</th><th>Ghi chú</th></tr></thead><tbody id="thaoMoveRows"></tbody></table></div></div><div class="card"><h2>⛔ Bỏ ấp</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã tổ</th><th>Lý do</th></tr></thead><tbody id="thaoDropRows"></tbody></table></div></div></section>
+
+<section class="page" id="settings"><h1>Cài đặt & dữ liệu</h1><p class="sub">Cấu hình quy mô trại và quản lý dữ liệu lưu trên thiết bị này.</p><div class="card"><h2>Quy mô trại</h2><p>Hệ thống khởi tạo sẵn 1.800 mã ô từ 001 đến 1800.</p><p class="notice">Dữ liệu trại chim chính được lưu trên Firebase và có bản lưu cục bộ trên thiết bị. Dữ liệu app Thảo được hiển thị riêng ở mục “Dữ liệu app Thảo”, không tự ghi đè dữ liệu chính.</p><button class="danger" id="clearBtn">Xóa toàn bộ dữ liệu đã nhập và khởi tạo lại 1.800 ô</button></div></section>
 </main></div>
 </div>
 <script>
@@ -141,6 +143,8 @@ const blank=()=>({coops:Array.from({length:1800},(_,i)=>({id:String(i+1).padStar
 let db=blank();
 let auth=null, authApi=null, firestore=null, currentUser=null, cloudReady=false, cloudRef=null;
 let saveQueue=Promise.resolve(), localKey='pigeonFarmDB';
+let thaoUnsubscribe=null, thaoLiveData=null;
+const THAO_UID='1ePS2ZPFVpVyErE3L81CzJT6kPb2';
 function normalizeDb(value){
  const base=blank(); if(!value||typeof value!=='object')return base;
  for(const key of ['coops','incubations','incubationDrops','raisingProfiles','eggPhotoLogs','eggs','pairings','chicks','transfers','sales','expenses','manureSales']) if(Array.isArray(value[key]))base[key]=value[key];
@@ -280,6 +284,30 @@ async function login(){
  try{await authApi.signInWithEmailAndPassword(auth,email,password)}catch(e){$('loginMessage').textContent='Đăng nhập chưa thành công: '+friendlyError(e);btn.disabled=false;btn.textContent='ĐĂNG NHẬP';console.error(e)}
 }
 async function logout(){try{await authApi.signOut(auth)}catch(e){alert('Không đăng xuất được: '+friendlyError(e))}}
+function renderThaoData(data){
+ const x=data||{}, arr=k=>Array.isArray(x[k])?x[k]:[], eggs=arr('eggs'),nests=arr('nests'),pairs=arr('pairs'),chicks=arr('chicks'),moves=arr('moves'),drops=arr('drops');
+ const status=$('thaoCloudStatus'); if(status)status.textContent='Đang nhận dữ liệu realtime';
+ const updated=$('thaoCloudUpdated'); if(updated){let d=x.updatedAt?.toDate?x.updatedAt.toDate():null;updated.textContent=d?'Cập nhật gần nhất: '+d.toLocaleString('vi-VN'):'Đã nhận dữ liệu từ app Thảo.'}
+ const kpis=[['Trứng',eggs.reduce((a,r)=>a+(Number(r.count)||0),0)],['Tổ đang ấp',nests.filter(r=>r.active!==false).length],['Lượt ghép đôi',pairs.length],['Lượt giao nuôi',chicks.length],['Lượt chuyển tổ',moves.length],['Lượt bỏ ấp',drops.length]];
+ $('thaoKpis').innerHTML=kpis.map(([a,b])=>`<div class="card kpi"><label>${a}</label><b>${fmt(b)}</b></div>`).join('');
+ const empty='<tr><td colspan="8" class="muted">Chưa có dữ liệu.</td></tr>';
+ const rows=(list,fn)=>list.length?list.map(fn).join(''):empty;
+ $('thaoEggRows').innerHTML=rows(eggs,r=>`<tr><td>${esc(r.date||'')}</td><td>${esc(String(r.nest??''))}</td><td>${fmt(r.count)}</td><td>${esc(r.note||'')}</td></tr>`);
+ $('thaoNestRows').innerHTML=rows(nests,r=>`<tr><td>${esc(r.date||'')}</td><td>${esc(String(r.nest??''))}</td><td>${r.active===false?'Đã kết thúc':'Đang ấp'}</td><td>${r.priority==='yes'?'Có':'Không'}</td><td>${r.quality==='poor'?'Nuôi kém':'Nuôi tốt'}</td><td>${esc(r.note||'')}</td></tr>`);
+ $('thaoPairRows').innerHTML=rows(pairs,r=>`<tr><td>${esc(r.date||'')}</td><td>${esc(String(r.nest??''))}</td><td>${esc(r.male||'')}</td><td>${esc(r.female||'')}</td><td>${esc(r.note||'')}</td></tr>`);
+ $('thaoChickRows').innerHTML=rows(chicks,r=>`<tr><td>${esc(r.date||'')}</td><td>${esc(String(r.nest??''))}</td><td>${fmt(r.count)}</td><td>${r.quality==='poor'?'Nuôi kém':'Nuôi tốt'}</td><td>${esc(r.note||'')}</td></tr>`);
+ $('thaoMoveRows').innerHTML=rows(moves,r=>`<tr><td>${esc(r.date||'')}</td><td>${esc(String(r.from??''))}</td><td>${esc(String(r.to??''))}</td><td>${fmt(r.count)}</td><td>${esc(r.note||'')}</td></tr>`);
+ $('thaoDropRows').innerHTML=rows(drops,r=>`<tr><td>${esc(r.date||'')}</td><td>${esc(String(r.nest??''))}</td><td>${esc(r.reason||'')}</td></tr>`);
+}
+function listenThaoData(database,storeMod){
+ if(thaoUnsubscribe){thaoUnsubscribe();thaoUnsubscribe=null;}
+ const thaoRef=storeMod.doc(database,'users',THAO_UID,'farmData','appThaoV1');
+ $('thaoCloudStatus').textContent='Đang kết nối app Thảo...';
+ thaoUnsubscribe=storeMod.onSnapshot(thaoRef,snap=>{
+  if(!snap.exists()){thaoLiveData={};renderThaoData({});$('thaoCloudStatus').textContent='Chưa có tài liệu app Thảo';return;}
+  thaoLiveData=snap.data()||{};renderThaoData(thaoLiveData);setSync('☁️ Đã kết nối app chính và nhận dữ liệu app Thảo realtime.');
+ },err=>{console.error('Thao realtime:',err);$('thaoCloudStatus').textContent='Lỗi đọc dữ liệu app Thảo: '+friendlyError(err);});
+}
 async function startFirebase(){
  try{
   const [appMod,authMod,storeMod]=await Promise.all([
@@ -291,7 +319,7 @@ async function startFirebase(){
   const firebaseApp=appMod.initializeApp(config);auth=authMod.getAuth(firebaseApp);authApi=authMod;firestore=storeMod;
   authMod.onAuthStateChanged(auth,async user=>{
    currentUser=user;cloudReady=false;
-   if(!user){$('mainApp').style.display='none';$('loginPanel').style.display='block';$('loginBtn').disabled=false;$('loginBtn').textContent='ĐĂNG NHẬP';return;}
+   if(!user){if(thaoUnsubscribe){thaoUnsubscribe();thaoUnsubscribe=null;}$('mainApp').style.display='none';$('loginPanel').style.display='block';$('loginBtn').disabled=false;$('loginBtn').textContent='ĐĂNG NHẬP';return;}
    $('loginPanel').style.display='none';$('mainApp').style.display='block';setSync('Đang tải dữ liệu từ Firebase...');
    localKey='pigeonFarmDB_'+user.uid;
    const database=storeMod.getFirestore(firebaseApp);
@@ -312,7 +340,7 @@ async function startFirebase(){
      }else setSync('Đã đăng nhập. Chưa có dữ liệu trên máy chủ; dữ liệu mới sẽ được đồng bộ khi lưu.');
      localStorage.setItem(localKey,JSON.stringify(db));
     }
-    cloudReady=true;render();
+    cloudReady=true;render();listenThaoData(database,storeMod);
    }catch(e){cloudReady=false;setSync('Không tải được dữ liệu: '+friendlyError(e));alert('Không tải được dữ liệu Firebase. Ứng dụng tạm khóa đồng bộ để tránh ghi đè dữ liệu cũ. Chi tiết: '+friendlyError(e));}
   });
  }catch(e){$('loginPanel').style.display='block';$('mainApp').style.display='none';$('loginMessage').textContent='Không khởi tạo được Firebase: '+friendlyError(e);console.error(e)}
