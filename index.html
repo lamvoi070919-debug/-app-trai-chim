@@ -51,7 +51,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 <header><div><strong>🐦 TRẠI CHIM CÂU</strong><br><small>Hệ thống quản lý 1.800 ô</small></div><div style="text-align:right"><small id="today"></small><br><small id="syncStatus">Đang kết nối...</small> <button type="button" class="secondary" style="padding:5px 8px;font-size:11px" onclick="logout()">Đăng xuất</button></div></header>
 <div class="layout">
 <aside><div class="brand">🐦 Trại chim câu<br><small>Quản lý khoa học</small></div><nav id="nav">
-<button class="active" data-page="overview">⌂ Tổng quan</button><button data-page="coops">▦ Quản lý ô</button><button data-page="incubation">🥚 Theo dõi tổ ấp</button><button data-page="eggs">◉ Theo dõi trứng</button><button data-page="pairing">♡ Ghép con</button><button data-page="chicks">🐣 Chim con</button><button data-page="transfers">⇄ Chuyển tổ</button><button data-page="sales">▣ Chim bán</button><button data-page="expenses">💸 Chi phí</button><button data-page="reports">▥ Thống kê</button><button data-page="settings">⚙ Cài đặt</button>
+<button class="active" data-page="overview">⌂ Tổng quan</button><button data-page="coops">▦ Quản lý ô</button><button data-page="incubation">🥚 Theo dõi tổ ấp</button><button data-page="raising">🐣 Ưu tiên nuôi con</button><button data-page="eggs">◉ Theo dõi trứng</button><button data-page="pairing">♡ Ghép con</button><button data-page="chicks">🐣 Chim con</button><button data-page="transfers">⇄ Chuyển tổ</button><button data-page="sales">▣ Chim bán</button><button data-page="expenses">💸 Chi phí</button><button data-page="reports">▥ Thống kê</button><button data-page="settings">⚙ Cài đặt</button>
 </nav></aside>
 <main>
 <section class="page active" id="overview">
@@ -59,9 +59,10 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 <div class="grid" id="kpis"></div>
 <div class="grid two">
 <div class="card"><h2>📅 Tổ đang ấp theo ngày</h2><div class="row"><input type="date" id="incDay"></div><div id="incSummary" class="notice">Chọn ngày để xem danh sách ô đang ấp.</div><div class="tablewrap"><table><thead><tr><th>Mã ô</th><th>Trạng thái</th><th>Ghi chú</th></tr></thead><tbody id="incDayRows"></tbody></table></div></div>
-<div class="card"><h2>🐣 Dự kiến chim bán</h2><div id="forecastSummary"></div><div class="notice">Mốc dự kiến tính từ ngày ghép chim con lên ổ: chuẩn bị bán 20–25 ngày; đến tuổi xuất bán 29–33 ngày.</div></div>
+<div class="card"><h2>🐣 Dự kiến chim bán</h2><div id="forecastSummary"></div><div class="notice">Ngày bắt đầu bán dự kiến = ngày ghép + 25 ngày; hạn bán muộn nhất = ngày ghép + 30 ngày.</div></div>
 </div>
 <div class="card"><h2>📈 Sản lượng tháng hiện tại</h2><div id="monthSummary" class="grid"></div></div>
+<div class="card"><h2>🔄 Dữ liệu nhận từ app Thảo</h2><p class="muted">Thông tin nhân viên cập nhật được nhận trực tiếp từ Firebase. Dữ liệu gốc của app chính vẫn được giữ riêng, không bị ghi đè.</p><div id="thaoSyncSummary"><p class="muted">Đang chờ dữ liệu app Thảo...</p></div><p class="hint" id="thaoUpdated">Chưa có dữ liệu cập nhật.</p><h3>Trứng Thảo mới ghi nhận</h3><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã tổ</th><th>Số quả</th><th>Ghi chú</th></tr></thead><tbody id="thaoEggRows"><tr><td colspan="4">Chưa có dữ liệu.</td></tr></tbody></table></div></div>
 </section>
 
 <section class="page" id="coops"><h1>Quản lý 1.800 ô</h1><p class="sub">Mỗi ô có mã cố định từ 001 đến 1800. Có thể tìm và cập nhật trạng thái ô.</p>
@@ -70,24 +71,31 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 
 <section class="page" id="incubation"><h1>Theo dõi tổ ấp</h1><p class="sub">Ghi nhận theo từng ngày; bấm ngày trong lịch sử để xem mã ô đang ấp và chuẩn bị ghép chim con.</p>
 <div class="card"><form id="incForm"><div class="fields"><div><label>Ngày thống kê</label><input type="date" id="incDate" required></div><div><label>Danh sách mã ô đang ấp</label><input id="incSlots" placeholder="001, 002, 015" required></div><div><label>Số tổ ấp</label><input id="incCount" type="number" min="0" placeholder="Tự đếm nếu để trống"></div></div><div><label>Ghi chú</label><input id="incNote" placeholder="Ghi chú (không bắt buộc)"></div><div class="actions"><button>Lưu thống kê ngày</button></div></form></div>
+<div class="card"><h2>Bỏ ấp</h2><form id="dropIncForm"><div class="fields"><div><label>Ngày bỏ ấp</label><input type="date" id="dropIncDate" required></div><div><label>Mã ô bỏ ấp</label><input id="dropIncSlots" placeholder="001, 002, 015" required></div><div><label>Ghi chú</label><input id="dropIncNote" placeholder="Không bắt buộc"></div></div><div class="actions"><button type="submit" class="danger">Lưu bỏ ấp</button></div></form><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã ô bỏ ấp</th><th>Ghi chú</th><th></th></tr></thead><tbody id="dropIncRows"></tbody></table></div></div>
 <div class="card"><h2>Lịch sử tổ ấp</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Số tổ ấp</th><th>Danh sách ô</th><th>Ghi chú</th><th></th></tr></thead><tbody id="incRows"></tbody></table></div></div></section>
+
+<section class="page" id="raising"><h1>Ưu tiên tổ ấp nuôi con</h1><p class="sub">Đánh dấu chất lượng nuôi con và tự đếm số lần mỗi ô đã được phân công.</p>
+<div class="card"><form id="raisingForm"><div class="fields"><div><label>Mã ô</label><input id="raisingSlot" placeholder="001" required></div><div><label>Đánh giá nuôi con</label><select id="raisingQuality"><option value="good">Nuôi con tốt – ưu tiên</option><option value="normal">Bình thường</option><option value="poor">Nuôi con kém – không ưu tiên</option></select></div><div><label>Ghi chú</label><input id="raisingNote" placeholder="Ghi chú thêm"></div></div><div class="actions"><button>Lưu đánh giá</button></div></form></div>
+<div class="grid" id="raisingKpis"></div><div class="card"><h2>Danh sách tổ ưu tiên ấp nuôi con</h2><p class="hint">Tổ tốt được xếp trước; trong cùng mức ưu tiên, ô có số lần nuôi con ít hơn đứng trước. Ô nuôi con kém không nằm trong danh sách ưu tiên.</p><div class="tablewrap"><table><thead><tr><th>Thứ tự</th><th>Mã ô</th><th>Đánh giá</th><th>Số lần đã nuôi</th><th>Ghi chú</th></tr></thead><tbody id="raisingRows"></tbody></table></div></div></section>
 
 <section class="page" id="eggs"><h1>Theo dõi trứng</h1><p class="sub">Ghi riêng ngày đẻ quả 1, quả 2 và số lượng trứng theo từng ô.</p>
 <div class="card"><form id="eggForm"><div class="fields"><div><label>Mã ô</label><input id="eggSlot" required placeholder="001"></div><div><label>Ngày đẻ quả 1</label><input id="egg1Date" type="date"></div><div><label>Ngày đẻ quả 2</label><input id="egg2Date" type="date"></div><div><label>Số trứng quả 1</label><input id="egg1Count" type="number" min="0" value="1"></div><div><label>Số trứng quả 2</label><input id="egg2Count" type="number" min="0" value="1"></div><div><label>Ghi chú</label><input id="eggNote"></div></div><div class="actions"><button>Lưu lần đẻ</button></div></form></div>
+<div class="card"><h2>📷 Chụp ảnh trứng nhặt</h2><form id="eggPhotoForm"><div class="fields"><div><label>Ngày nhặt</label><input id="photoEggDate" type="date" required></div><div><label>Số trứng kiểm tra từ ảnh</label><input id="photoEggCount" type="number" min="0" required placeholder="Nhập số lượng sau khi kiểm tra"></div><div><label>Ghi chú</label><input id="photoEggNote" placeholder="Không bắt buộc"></div></div><div style="margin-top:10px"><label>Chụp ảnh / chọn ảnh trứng</label><input id="eggPhotoFile" type="file" accept="image/*" capture="environment"><img id="eggPhotoPreview" alt="Ảnh trứng vừa chụp" style="display:none;max-width:100%;max-height:230px;object-fit:contain;margin-top:10px;border-radius:10px"></div><p class="notice">Ảnh chỉ hiển thị tạm thời trên iPhone để đối chiếu, không tải lên Firebase và không lưu trong dữ liệu sao lưu. Chỉ ngày, số lượng bạn xác nhận và ghi chú được lưu. Bản này chưa có dịch vụ AI tự đếm; vui lòng kiểm tra ảnh rồi nhập số lượng chính xác.</p><div class="actions"><button type="submit">Lưu số trứng từ ảnh</button></div></form><div id="eggPhotoTotals" class="notice"></div></div>
 <div class="card"><div class="row"><h2>Thống kê trứng theo tháng</h2><input id="eggMonth" type="month"></div><div id="eggTotals" class="notice"></div><div class="tablewrap"><table><thead><tr><th>Mã ô</th><th>Ngày quả 1</th><th>SL quả 1</th><th>Ngày quả 2</th><th>SL quả 2</th><th>Tổng</th></tr></thead><tbody id="eggRows"></tbody></table></div></div></section>
-
 <section class="page" id="pairing"><h1>Ghép chim con lên ổ</h1><p class="sub">Ghi ngày ghép, số tổ và số chim. Dữ liệu này làm căn cứ dự kiến bán.</p>
 <div class="card"><form id="pairForm"><div class="fields"><div><label>Ngày ghép</label><input id="pairDate" type="date" required></div><div><label>Số tổ ghép</label><input id="pairNests" type="number" min="0" required></div><div><label>Số chim ghép</label><input id="pairBirds" type="number" min="0" required></div><div><label>Mã ô (cách nhau bằng dấu phẩy)</label><input id="pairSlots" placeholder="001,002"></div><div><label>Ghi chú</label><input id="pairNote"></div></div><div class="actions"><button>Lưu lần ghép</button></div></form></div>
 <div class="card"><h2>Lịch sử ghép con</h2><div class="tablewrap"><table><thead><tr><th>Ngày ghép</th><th>Số tổ</th><th>Số chim</th><th>Mã ô</th><th>Ghi chú</th></tr></thead><tbody id="pairRows"></tbody></table></div></div></section>
 
 <section class="page" id="chicks"><h1>Theo dõi chim con</h1><p class="sub">Cập nhật số chim ổn định, số chết và lý do chết theo từng đợt ghép.</p>
 <div class="card"><form id="chickForm"><div class="fields"><div><label>Đợt ghép</label><select id="chickPair" required></select></div><div><label>Số chim ổn định / sống</label><input id="chickAlive" type="number" min="0" required></div><div><label>Số chim chết</label><input id="chickDead" type="number" min="0" required></div><div><label>Lý do chết</label><select id="chickReason"><option>Không rõ</option><option>Bệnh</option><option>Yếu</option><option>Bố mẹ bỏ nuôi</option><option>Tai nạn</option><option>Khác</option></select></div><div><label>Ngày cập nhật</label><input id="chickDate" type="date" required></div><div><label>Ghi chú</label><input id="chickNote"></div></div><div class="actions"><button>Lưu tình trạng</button></div></form></div>
-<div class="card"><h2>Tổng hợp chim con</h2><div id="chickTotals" class="notice"></div><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Ngày ghép</th><th>Sống/ổn định</th><th>Chết</th><th>Lý do</th><th>Ghi chú</th></tr></thead><tbody id="chickRows"></tbody></table></div></div></section><section class="page" id="transfers"><h1>Theo dõi chuyển tổ</h1><p class="sub">Ghi tổ chuyển đi, tổ chuyển đến và số chim; tự cộng tổng theo tháng.</p>
+<div class="card"><h2>Tổng hợp chim con</h2><div id="chickTotals" class="notice"></div><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Ngày ghép</th><th>Sống/ổn định</th><th>Chết</th><th>Lý do</th><th>Ghi chú</th></tr></thead><tbody id="chickRows"></tbody></table></div></div></section>
+
+<section class="page" id="transfers"><h1>Theo dõi chuyển tổ</h1><p class="sub">Ghi tổ chuyển đi, tổ chuyển đến và số chim; tự cộng tổng theo tháng.</p>
 <div class="card"><form id="transferForm"><div class="fields"><div><label>Ngày chuyển</label><input id="transferDate" type="date" required></div><div><label>Tổ chuyển đi</label><input id="fromSlot" required placeholder="001"></div><div><label>Tổ chuyển đến</label><input id="toSlot" required placeholder="025"></div><div><label>Số chim chuyển</label><input id="transferBirds" type="number" min="1" required></div><div><label>Ghi chú</label><input id="transferNote"></div></div><div class="actions"><button>Lưu chuyển tổ</button></div></form></div>
 <div class="card"><div class="row"><h2>Lịch sử chuyển tổ</h2><input type="month" id="transferMonth"></div><div id="transferTotals" class="notice"></div><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Tổ đi</th><th>Tổ đến</th><th>Số chim</th><th>Ghi chú</th></tr></thead><tbody id="transferRows"></tbody></table></div></div></section>
 
 <section class="page" id="sales"><h1>Chim bán & doanh thu</h1><p class="sub">Dự kiến bán tự động từ ngày ghép; ghi nhận bán thực tế và phân loại 1, 2, 3.</p>
-<div class="card"><h2>Dự kiến xuất bán</h2><div class="grid two"><div><h3>Chuẩn bị bán (20–25 ngày)</h3><div id="readyForecast"></div></div><div><h3>Đến tuổi xuất bán (29–33 ngày)</h3><div id="sellForecast"></div></div></div><div class="hint">Bấm vào số lượng để xem các đợt ghép dự kiến. Đây là dự báo theo ngày ghép, không tự xác nhận số chim thực tế.</div></div>
+<div class="card"><h2>Dự kiến xuất bán</h2><div class="grid two"><div><h3>Bắt đầu bán (25–30 ngày)</h3><div id="readyForecast"></div></div><div><h3>Hạn bán theo mốc 30 ngày</h3><div id="sellForecast"></div></div></div><div class="hint">Bấm vào số lượng để xem các đợt ghép dự kiến. Đây là dự báo theo ngày ghép, không tự xác nhận số chim thực tế.</div></div>
 <div class="card"><h2>Đơn giá theo phân loại (VNĐ/con)</h2><form id="priceForm"><div class="fields"><div><label>Loại 1</label><input id="price1" type="number" min="0"></div><div><label>Loại 2</label><input id="price2" type="number" min="0"></div><div><label>Loại 3</label><input id="price3" type="number" min="0"></div></div><div class="actions"><button>Lưu đơn giá</button></div></form></div>
 <div class="card"><h2>Ghi nhận bán thực tế</h2><form id="saleForm"><div class="fields"><div><label>Ngày bán</label><input id="saleDate" type="date" required></div><div><label>Phân loại</label><select id="saleGrade"><option value="1">Loại 1</option><option value="2">Loại 2</option><option value="3">Loại 3</option></select></div><div><label>Số chim bán</label><input id="saleQty" type="number" min="1" required></div><div><label>Đơn giá (VNĐ/con)</label><input id="salePrice" type="number" min="0" required></div><div><label>Mã ô xuất chim (để tính lãi từng ô)</label><input id="saleSlot" placeholder="VD: 001"></div><div><label>Ghi chú / khách mua</label><input id="saleNote"></div></div><div class="actions"><button>Lưu giao dịch bán</button></div></form></div>
 <div class="card"><h2>💩 Doanh thu phân chim</h2><p class="hint">Chỉ cần chọn ngày và nhập tổng số tiền thu được. Không cần nhập số lượng, đơn giá hay thông tin khách mua.</p><form id="manureForm"><div class="fields">
@@ -129,33 +137,84 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 </div>
 <script>
 const $=id=>document.getElementById(id), today=()=>new Date().toISOString().slice(0,10), fmt=n=>Number(n||0).toLocaleString('vi-VN'), money=n=>fmt(n)+' ₫', monthNow=()=>today().slice(0,7), parseList=s=>[...new Set((s||'').split(/[,;\s]+/).map(x=>x.trim()).filter(Boolean))];
-const blank=()=>({coops:Array.from({length:1800},(_,i)=>({id:String(i+1).padStart(3,'0'),status:'Trống',parents:'Bình thường'})),incubations:[],eggs:[],pairings:[],chicks:[],transfers:[],sales:[],expenses:[],manureSales:[],prices:{1:170000,2:150000,3:130000}});
+const blank=()=>({coops:Array.from({length:1800},(_,i)=>({id:String(i+1).padStart(3,'0'),status:'Trống',parents:'Bình thường'})),incubations:[],incubationDrops:[],raisingProfiles:[],eggPhotoLogs:[],eggs:[],pairings:[],chicks:[],transfers:[],sales:[],expenses:[],manureSales:[],prices:{1:170000,2:150000,3:130000}});
 let db=blank();
 let auth=null, authApi=null, firestore=null, currentUser=null, cloudReady=false, cloudRef=null;
+let bridgeRef=null, bridgeUnsubscribe=null, thaoData=null;
 let saveQueue=Promise.resolve(), localKey='pigeonFarmDB';
 function normalizeDb(value){
  const base=blank(); if(!value||typeof value!=='object')return base;
- for(const key of ['coops','incubations','eggs','pairings','chicks','transfers','sales','expenses','manureSales']) if(Array.isArray(value[key]))base[key]=value[key];
+ for(const key of ['coops','incubations','incubationDrops','raisingProfiles','eggPhotoLogs','eggs','pairings','chicks','transfers','sales','expenses','manureSales']) if(Array.isArray(value[key]))base[key]=value[key];
  if(value.prices&&typeof value.prices==='object')base.prices={...base.prices,...value.prices};
  if(base.coops.length!==1800){const old=new Map(base.coops.map(x=>[String(x.id).padStart(3,'0'),x]));base.coops=base.coops.length?base.coops:blank().coops;}
  return base;
 }
 try{db=normalizeDb(JSON.parse(localStorage.getItem('pigeonFarmDB')||'null'))}catch(e){db=blank()}
+function makeMainMirror(snapshot){
+ return {
+  coops:snapshot.coops,incubations:snapshot.incubations,incubationDrops:snapshot.incubationDrops,
+  raisingProfiles:snapshot.raisingProfiles,eggs:snapshot.eggs,pairings:snapshot.pairings,
+  chicks:snapshot.chicks,transfers:snapshot.transfers,sales:snapshot.sales,
+  expenses:snapshot.expenses,manureSales:snapshot.manureSales,prices:snapshot.prices,
+  updatedAt:new Date().toISOString()
+ };
+}
+async function publishMainMirror(snapshot){
+ if(!bridgeRef)return;
+ await firestore.setDoc(bridgeRef,{mainDB:makeMainMirror(snapshot),mainUpdatedAt:new Date().toISOString()},{merge:true});
+}
 function save(){
  if(!db||!Array.isArray(db.coops))return Promise.reject(new Error('Dữ liệu không hợp lệ; đã dừng lưu để bảo vệ dữ liệu.'));
  const snapshot=JSON.parse(JSON.stringify(db));
  try{localStorage.setItem(localKey,JSON.stringify(snapshot));}catch(e){setSync('Không lưu được bộ nhớ iPhone: '+e.message);}
  render();
  if(!cloudReady||!currentUser||!cloudRef){setSync('Chưa kết nối Firebase — dữ liệu tạm lưu trên iPhone.');return Promise.resolve();}
- saveQueue=saveQueue.then(()=>firestore.setDoc(cloudRef,{farmDB:snapshot,updatedAt:new Date().toISOString()})).then(()=>setSync('☁️ Đã đồng bộ Firebase lúc '+new Date().toLocaleTimeString('vi-VN'))).catch(e=>{setSync('Lỗi đồng bộ: '+friendlyError(e)+' · dữ liệu vẫn còn trên iPhone');console.error(e);});
+ saveQueue=saveQueue.then(async()=>{
+  await firestore.setDoc(cloudRef,{farmDB:snapshot,updatedAt:new Date().toISOString()},{merge:true});
+  await publishMainMirror(snapshot);
+  setSync('☁️ Đã đồng bộ app chính và gửi dữ liệu sang app Thảo lúc '+new Date().toLocaleTimeString('vi-VN'));
+ }).catch(e=>{setSync('Lỗi đồng bộ: '+friendlyError(e)+' · dữ liệu vẫn còn trên iPhone');console.error(e);});
  return saveQueue;
+}
+function renderThaoSync(){
+ const box=$('thaoSyncSummary'); if(!box)return;
+ if(!thaoData){box.innerHTML='<p class="muted">Chưa nhận dữ liệu từ app Thảo. Hãy kiểm tra app Thảo đã kết nối Firebase.</p>';return;}
+ const d=thaoData;
+ const eggs=Array.isArray(d.eggs)?d.eggs:[], nests=Array.isArray(d.nests)?d.nests:[], pairs=Array.isArray(d.pairs)?d.pairs:[], chicks=Array.isArray(d.chicks)?d.chicks:[], moves=Array.isArray(d.moves)?d.moves:[], drops=Array.isArray(d.drops)?d.drops:[];
+ const eggCount=eggs.reduce((n,x)=>n+Number(x.count||1),0);
+ const activeNests=nests.filter(x=>x.active!==false).length;
+ box.innerHTML=`<div class="grid"><div class="card kpi"><label>Lượt ghi trứng</label><b>${fmt(eggs.length)}</b><small>${fmt(eggCount)} quả</small></div><div class="card kpi"><label>Tổ đang ấp</label><b>${fmt(activeNests)}</b></div><div class="card kpi"><label>Lượt ghép đôi</label><b>${fmt(pairs.length)}</b></div><div class="card kpi"><label>Lượt giao nuôi</label><b>${fmt(chicks.length)}</b></div><div class="card kpi"><label>Lượt chuyển tổ</label><b>${fmt(moves.length)}</b></div><div class="card kpi"><label>Lượt bỏ ấp</label><b>${fmt(drops.length)}</b></div></div>`;
+ const latest=[...eggs].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,8);
+ const rows=latest.map(x=>`<tr><td>${esc(x.date||'')}</td><td>${esc(String(x.nest??'').padStart(3,'0'))}</td><td>${fmt(x.count||1)}</td><td>${esc(x.note||'')}</td></tr>`).join('');
+ const table=$('thaoEggRows'); if(table)table.innerHTML=rows||'<tr><td colspan="4">Chưa có bản ghi trứng.</td></tr>';
+ const stamp=$('thaoUpdated'); if(stamp)stamp.textContent='Cập nhật từ app Thảo: '+(d.updatedAt||'đã nhận dữ liệu Firebase');
+}
+function setSync(message){const el=$('syncStatus');if(el)el.textContent=message;} saveQueue=saveQueue.then(async()=>{
+  await firestore.setDoc(cloudRef,{farmDB:snapshot,updatedAt:new Date().toISOString()},{merge:true});
+  await publishMainMirror(snapshot);
+  setSync('☁️ Đã đồng bộ app chính và gửi dữ liệu sang app Thảo lúc '+new Date().toLocaleTimeString('vi-VN'));
+ }).catch(e=>{setSync('Lỗi đồng bộ: '+friendlyError(e)+' · dữ liệu vẫn còn trên iPhone');console.error(e);});
+ return saveQueue;
+}
+function renderThaoSync(){
+ const box=$('thaoSyncSummary'); if(!box)return;
+ if(!thaoData){box.innerHTML='<p class="muted">Chưa nhận dữ liệu từ app Thảo. Hãy kiểm tra app Thảo đã kết nối Firebase.</p>';return;}
+ const d=thaoData;
+ const eggs=Array.isArray(d.eggs)?d.eggs:[], nests=Array.isArray(d.nests)?d.nests:[], pairs=Array.isArray(d.pairs)?d.pairs:[], chicks=Array.isArray(d.chicks)?d.chicks:[], moves=Array.isArray(d.moves)?d.moves:[], drops=Array.isArray(d.drops)?d.drops:[];
+ const eggCount=eggs.reduce((n,x)=>n+Number(x.count||1),0);
+ const activeNests=nests.filter(x=>x.active!==false).length;
+ box.innerHTML=`<div class="grid"><div class="card kpi"><label>Lượt ghi trứng</label><b>${fmt(eggs.length)}</b><small>${fmt(eggCount)} quả</small></div><div class="card kpi"><label>Tổ đang ấp</label><b>${fmt(activeNests)}</b></div><div class="card kpi"><label>Lượt ghép đôi</label><b>${fmt(pairs.length)}</b></div><div class="card kpi"><label>Lượt giao nuôi</label><b>${fmt(chicks.length)}</b></div><div class="card kpi"><label>Lượt chuyển tổ</label><b>${fmt(moves.length)}</b></div><div class="card kpi"><label>Lượt bỏ ấp</label><b>${fmt(drops.length)}</b></div></div>`;
+ const latest=[...eggs].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,8);
+ const rows=latest.map(x=>`<tr><td>${esc(x.date||'')}</td><td>${esc(String(x.nest??'').padStart(3,'0'))}</td><td>${fmt(x.count||1)}</td><td>${esc(x.note||'')}</td></tr>`).join('');
+ const table=$('thaoEggRows'); if(table)table.innerHTML=rows||'<tr><td colspan="4">Chưa có bản ghi trứng.</td></tr>';
+ const stamp=$('thaoUpdated'); if(stamp)stamp.textContent='Cập nhật từ app Thảo: '+(d.updatedAt||'đã nhận dữ liệu Firebase');
 }
 function setSync(message){const el=$('syncStatus');if(el)el.textContent=message;}
 function dateIn(d,a,b){return d>=a&&d<=b}
 function monthRange(m){return [m+'-01',m+'-31']}
 function sum(arr,key){return arr.reduce((s,x)=>s+Number(x[key]||0),0)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function setDefaults(){['incDay','incDate','egg1Date','egg2Date','pairDate','chickDate','transferDate','saleDate','expenseDate','manureDate'].forEach(id=>{if($(id))$(id).value=today()});['eggMonth','transferMonth','salesMonth','expenseMonth','manureMonth'].forEach(id=>{if($(id))$(id).value=monthNow()});$('today').textContent=new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}
+function setDefaults(){['incDay','incDate','dropIncDate','photoEggDate','egg1Date','egg2Date','pairDate','chickDate','transferDate','saleDate','expenseDate','manureDate'].forEach(id=>{if($(id))$(id).value=today()});['eggMonth','transferMonth','salesMonth','expenseMonth','manureMonth'].forEach(id=>{if($(id))$(id).value=monthNow()});$('today').textContent=new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}
 function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));render()}
 $('nav').addEventListener('click',e=>{let b=e.target.closest('button[data-page]');if(b)page(b.dataset.page)});
 function byDate(list,d){return list.filter(x=>x.date===d)}
@@ -163,12 +222,16 @@ function render(){
 const counts=Object.fromEntries(['Đang ấp','Ấp và nuôi con','Trống','Chờ đẻ'].map(s=>[s,db.coops.filter(c=>c.status===s).length]));
 $('kpis').innerHTML=[['Tổng số ô',db.coops.length],['Đang ấp',counts['Đang ấp']],['Ấp và nuôi con',counts['Ấp và nuôi con']],['Trống',counts['Trống']],['Chờ đẻ',counts['Chờ đẻ']]].map((x,i)=>`<div class="card kpi"><label>${x[0]}</label><b>${fmt(x[1])}</b><small>${i?'ô trong trại':'mã ô đã khởi tạo'}</small></div>`).join('');
 let d=$('incDay')?.value||today(), inc=db.incubations.find(x=>x.date===d), slots=inc?.slots||[];$('incSummary').textContent=inc?`${inc.count} tổ đang ấp ngày ${d}. Bấm ngày trong lịch sử ở mục Theo dõi tổ ấp để xem danh sách.`:`Chưa có dữ liệu tổ ấp cho ngày ${d}.`; $('incDayRows').innerHTML=slots.map(id=>`<tr><td>${esc(id)}</td><td><span class="pill">Đang ấp</span></td><td></td></tr>`).join('');
-let now=today(), ready=db.pairings.filter(p=>{let age=(new Date(now)-new Date(p.date))/86400000;return age>=20&&age<=25}), sell=db.pairings.filter(p=>{let age=(new Date(now)-new Date(p.date))/86400000;return age>=29&&age<=33});
-$('forecastSummary').innerHTML=`<p><b>${ready.length}</b> đợt ghép trong cửa sổ chuẩn bị bán · <b>${fmt(sum(ready,'birds'))}</b> chim dự kiến</p><p><b>${sell.length}</b> đợt ghép đến tuổi bán · <b>${fmt(sum(sell,'birds'))}</b> chim dự kiến</p>`;
-let m=monthNow(), eggs=db.eggs.filter(x=>(x.date1||'').startsWith(m)||(x.date2||'').startsWith(m)), pairs=db.pairings.filter(x=>x.date.startsWith(m)), chicks=db.chicks.filter(x=>x.date.startsWith(m));$('monthSummary').innerHTML=[['Trứng ghi nhận',sum(eggs,'count1')+sum(eggs,'count2')],['Tổ ghép',sum(pairs,'nests')],['Chim ghép',sum(pairs,'birds')],['Chim chết',sum(chicks,'dead')]].map(x=>`<div class="card kpi"><label>${x[0]}</label><b>${fmt(x[1])}</b></div>`).join('');
+let now=today(), ready=db.pairings.filter(p=>{let age=(new Date(now)-new Date(p.date))/86400000;return age>=25&&age<=30}), sell=db.pairings.filter(p=>{let age=(new Date(now)-new Date(p.date))/86400000;return age===30});
+$('forecastSummary').innerHTML=`<p><b>${ready.length}</b> đợt ghép trong khoảng bắt đầu bán (ngày 25–30) · <b>${fmt(sum(ready,'birds'))}</b> chim dự kiến</p><p><b>${sell.length}</b> đợt ghép đến mốc 30 ngày · <b>${fmt(sum(sell,'birds'))}</b> chim dự kiến</p>`;
+let m=monthNow(), eggs=db.eggs.filter(x=>(x.date1||'').startsWith(m)||(x.date2||'').startsWith(m)), pairs=db.pairings.filter(x=>x.date.startsWith(m)), chicks=db.chicks.filter(x=>x.date.startsWith(m));
+$('monthSummary').innerHTML=[['Trứng ghi nhận',sum(eggs,'count1')+sum(eggs,'count2')],['Tổ ghép',sum(pairs,'nests')],['Chim ghép',sum(pairs,'birds')],['Chim chết',sum(chicks,'dead')]].map(x=>`<div class="card kpi"><label>${x[0]}</label><b>${fmt(x[1])}</b></div>`).join('');
 // coops
 let q=($('coopSearch')?.value||'').toLowerCase(),f=$('coopFilter')?.value||'', filtered=db.coops.filter(c=>(!q||c.id.includes(q))&&(!f||c.status===f));$('coopRows').innerHTML=filtered.slice(0,250).map(c=>`<tr><td><b>${c.id}</b></td><td>${esc(c.status)}</td><td>${esc(c.parents)}</td><td><button class="secondary" onclick="editCoop('${c.id}')">Sửa</button></td></tr>`).join('');$('coopCount').textContent=`Hiển thị ${Math.min(filtered.length,250)} / ${filtered.length} ô phù hợp.`;
 $('incRows').innerHTML=[...db.incubations].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td><button class="secondary" onclick="showInc('${x.date}')">${x.date}</button></td><td>${fmt(x.count)}</td><td>${esc(x.slots.join(', '))}</td><td>${esc(x.note)}</td><td><button class="danger" onclick="del('incubations','${x.id}')">Xóa</button></td></tr>`).join('');
+$('dropIncRows').innerHTML=[...db.incubationDrops].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${esc(x.slots.join(', '))}</td><td>${esc(x.note||'')}</td><td><button class="danger" onclick="del('incubationDrops','${x.id}')">Xóa</button></td></tr>`).join('');
+let assigned={};db.pairings.forEach(p=>(p.slots||[]).forEach(slot=>{let k=String(slot).padStart(3,'0');assigned[k]=(assigned[k]||0)+1}));let profiles=new Map(db.raisingProfiles.map(x=>[String(x.slot).padStart(3,'0'),x]));let ranked=db.coops.map(c=>{let pr=profiles.get(c.id)||{quality:'normal',note:''};return {...pr,slot:c.id,times:assigned[c.id]||0}}).sort((a,b)=>(({good:0,normal:1,poor:2}[a.quality]??1)-({good:0,normal:1,poor:2}[b.quality]??1))||a.times-b.times||a.slot.localeCompare(b.slot));let good=ranked.filter(x=>x.quality==='good'),normal=ranked.filter(x=>x.quality==='normal'),poor=ranked.filter(x=>x.quality==='poor');$('raisingKpis').innerHTML=[['Tổ ưu tiên',good.length,'#197a3d'],['Tổ bình thường',normal.length,'#e59a22'],['Không ưu tiên',poor.length,'#c83b36']].map(x=>`<div class="card kpi" style="border-top-color:${x[2]}"><label>${x[0]}</label><b style="color:${x[2]}">${fmt(x[1])}</b></div>`).join('');$('raisingRows').innerHTML=[...good,...normal].slice(0,300).map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.slot}</b></td><td><span class="pill ${x.quality==='good'?'':'gold'}">${x.quality==='good'?'Ưu tiên':'Bình thường'}</span></td><td>${x.times}</td><td>${esc(x.note||'')}</td></tr>`).join('')+poor.slice(0,100).map(x=>`<tr style="background:#fff5f4"><td>—</td><td><b>${x.slot}</b></td><td><span class="pill red">Không ưu tiên</span></td><td>${x.times}</td><td>${esc(x.note||'')}</td></tr>`).join('');
+let photoMonth=$('eggMonth')?.value||monthNow(), photoLogs=db.eggPhotoLogs.filter(x=>x.date.startsWith(photoMonth));$('eggPhotoTotals').textContent=`Tháng ${photoMonth}: ${fmt(sum(photoLogs,'count'))} trứng ghi nhận từ ảnh · ${photoLogs.length} lần chụp.`;
 let em=$('eggMonth')?.value||monthNow(), er=db.eggs.filter(x=>(x.date1||'').startsWith(em)||(x.date2||'').startsWith(em));$('eggTotals').textContent=`Tháng ${em}: ${fmt(er.reduce((s,x)=>s+((x.date1||'').startsWith(em)?+x.count1:0)+((x.date2||'').startsWith(em)?+x.count2:0),0))} trứng · ${er.length} lượt ghi nhận.`;$('eggRows').innerHTML=er.map(x=>`<tr><td>${esc(x.slot)}</td><td>${x.date1||'—'}</td><td>${x.count1}</td><td>${x.date2||'—'}</td><td>${x.count2}</td><td><b>${+x.count1 + +x.count2}</b></td></tr>`).join('');
 $('pairRows').innerHTML=[...db.pairings].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${fmt(x.nests)}</td><td>${fmt(x.birds)}</td><td>${esc(x.slots.join(', '))}</td><td>${esc(x.note)}</td></tr>`).join('');
 $('chickPair').innerHTML=db.pairings.map(x=>`<option value="${x.id}">${x.date} · ${x.nests} tổ · ${x.birds} con</option>`).join('');$('chickRows').innerHTML=[...db.chicks].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>{let p=db.pairings.find(p=>p.id===x.pairId);return `<tr><td>${x.date}</td><td>${p?.date||'—'}</td><td>${fmt(x.alive)}</td><td>${fmt(x.dead)}</td><td>${esc(x.reason)}</td><td>${esc(x.note)}</td></tr>`}).join('');$('chickTotals').textContent=`Tổng cập nhật: ${fmt(sum(db.chicks,'alive'))} chim ổn định/sống · ${fmt(sum(db.chicks,'dead'))} chim chết.`;
@@ -189,6 +252,7 @@ $('expenseCategoryRows').innerHTML=categories.map(cat=>{let list=xr.filter(x=>x.
 $('expenseCount').textContent=`${xr.length} khoản trong tháng ${xm}`;
 $('expenseRows').innerHTML=[...xr].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${esc(x.category)}</td><td>${esc(x.name)}${x.vendor?' · '+esc(x.vendor):''}</td><td>${fmt(x.qty)} ${esc(x.unit)}</td><td>${money(x.price)}</td><td><b>${money(x.amount)}</b></td><td>${esc(x.note)}</td><td><button class="danger" onclick="del('expenses','${x.id}')">Xóa</button></td></tr>`).join('');
 renderReports();
+renderThaoSync();
 }
 function forecastHtml(list){return list.length?`<div class="notice">${list.map(p=>`<p><b>${p.date}</b> · ${p.nests} tổ · ${fmt(p.birds)} con · ${p.slots.join(', ')||'Chưa gắn mã ô'}</p>`).join('')}</div>`:'<p class="muted">Chưa có đợt ghép trong khoảng ngày này.</p>'}
 function showInc(d){$('incDay').value=d;$('incSummary').textContent='Đang xem danh sách ô của ngày '+d;let x=db.incubations.find(i=>i.date===d);$('incDayRows').innerHTML=(x?.slots||[]).map(id=>`<tr><td>${id}</td><td><span class="pill">Đang ấp</span></td><td></td></tr>`).join('');page('overview')}
@@ -198,6 +262,9 @@ function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,
 $('coopForm').onsubmit=e=>{e.preventDefault();let idv=$('coopId').value.trim().padStart(3,'0'),c=db.coops.find(x=>x.id===idv);if(!c)return alert('Mã ô phải từ 001 đến 1800.');c.status=$('coopStatus').value;c.parents=$('parentStatus').value;save();e.target.reset()};
 $('resetCoop').onclick=()=>$('coopForm').reset();$('coopSearch').oninput=render;$('coopFilter').onchange=render;$('incDay').onchange=render;
 $('incForm').onsubmit=e=>{e.preventDefault();let date=$('incDate').value,slots=parseList($('incSlots').value);let count=+$('incCount').value||slots.length;let rec={id:id(),date,slots,count,note:$('incNote').value};let old=db.incubations.findIndex(x=>x.date===date);if(old>=0)db.incubations[old]=rec;else db.incubations.push(rec);slots.forEach(s=>{let c=db.coops.find(x=>x.id===s.padStart(3,'0'));if(c)c.status='Đang ấp'});save();e.target.reset();setDefaults()};
+$('dropIncForm').onsubmit=e=>{e.preventDefault();let slots=parseList($('dropIncSlots').value).map(x=>x.padStart(3,'0'));db.incubationDrops.push({id:id(),date:$('dropIncDate').value,slots,note:$('dropIncNote').value.trim()});slots.forEach(slot=>{let c=db.coops.find(x=>x.id===slot);if(c&&c.status==='Đang ấp')c.status='Trống'});save();e.target.reset();setDefaults()}; $('raisingForm').onsubmit=e=>{e.preventDefault();let slot=$('raisingSlot').value.trim().padStart(3,'0');if(!db.coops.some(c=>c.id===slot))return alert('Mã ô phải từ 001 đến 1800.');let rec={slot,quality:$('raisingQuality').value,note:$('raisingNote').value.trim()};let i=db.raisingProfiles.findIndex(x=>x.slot===slot);if(i>=0)db.raisingProfiles[i]=rec;else db.raisingProfiles.push(rec);save();e.target.reset()};
+$('eggPhotoFile').onchange=e=>{let f=e.target.files[0],img=$('eggPhotoPreview');if(!f){img.style.display='none';img.removeAttribute('src');return}let reader=new FileReader();reader.onload=()=>{img.src=reader.result;img.style.display='block'};reader.readAsDataURL(f)};
+$('eggPhotoForm').onsubmit=e=>{e.preventDefault();db.eggPhotoLogs.push({id:id(),date:$('photoEggDate').value,count:+$('photoEggCount').value,note:$('photoEggNote').value.trim(),method:'photo-confirmed'});save();e.target.reset();$('eggPhotoPreview').style.display='none';$('eggPhotoPreview').removeAttribute('src');setDefaults()};
 $('eggForm').onsubmit=e=>{e.preventDefault();db.eggs.push({id:id(),slot:$('eggSlot').value.trim().padStart(3,'0'),date1:$('egg1Date').value,date2:$('egg2Date').value,count1:+$('egg1Count').value||0,count2:+$('egg2Count').value||0,note:$('eggNote').value});save();e.target.reset();setDefaults()};
 $('pairForm').onsubmit=e=>{e.preventDefault();let slots=parseList($('pairSlots').value);db.pairings.push({id:id(),date:$('pairDate').value,nests:+$('pairNests').value,birds:+$('pairBirds').value,slots,note:$('pairNote').value});slots.forEach(s=>{let c=db.coops.find(x=>x.id===s.padStart(3,'0'));if(c)c.status='Ấp và nuôi con'});save();e.target.reset();setDefaults()};
 $('chickForm').onsubmit=e=>{e.preventDefault();let pairId=$('chickPair').value;if(!pairId)return alert('Hãy tạo đợt ghép trước.');db.chicks.push({id:id(),pairId,date:$('chickDate').value,alive:+$('chickAlive').value,dead:+$('chickDead').value,reason:$('chickReason').value,note:$('chickNote').value});save();e.target.reset();setDefaults()};
@@ -234,11 +301,13 @@ $('profitRows').innerHTML=ranked.map(r=>`<tr><td><b>${r.slot}</b></td><td>${mone
 
 let year=now.getFullYear(),months=Array.from({length:12},(_,i)=>String(i+1).padStart(2,'0'));let stats=months.map(m=>{let key=year+'-'+m,ee=db.eggs.filter(x=>(x.date1||'').startsWith(key)||(x.date2||'').startsWith(key));return {m,eggs:ee.reduce((s,x)=>s+((x.date1||'').startsWith(key)?+x.count1:0)+((x.date2||'').startsWith(key)?+x.count2:0),0),paired:sum(db.pairings.filter(x=>x.date.startsWith(key)),'birds'),alive:sum(db.chicks.filter(x=>x.date.startsWith(key)),'alive'),sold:sum(db.sales.filter(x=>x.date.startsWith(key)),'qty'),manureRevenue:sum(db.manureSales.filter(x=>x.date.startsWith(key)),'amount'),cost:sum(db.expenses.filter(x=>x.date.startsWith(key)),'amount')}});let max=Math.max(1,...stats.flatMap(x=>[x.eggs,x.paired,x.alive,x.sold,x.manureRevenue,x.cost]));$('chart').innerHTML=stats.map(x=>`<div class="barline"><b>${x.m}/${year}</b><div class="bar"><i style="width:${100*x.eggs/max}%"></i></div><span>${fmt(x.eggs)} trứng</span><div></div><div class="bar"><i style="width:${100*x.paired/max}%;background:#4c91d6"></i></div><span>${fmt(x.paired)} ghép</span><div></div><div class="bar"><i style="width:${100*x.alive/max}%;background:#e6a23c"></i></div><span>${fmt(x.alive)} sống</span><div></div><div class="bar"><i style="width:${100*x.sold/max}%;background:#bd6cc2"></i></div><span>${fmt(x.sold)} bán</span><div></div><div class="bar"><i style="width:${100*x.cost/max}%;background:#d96b55"></i></div><span>${money(x.cost)} chi</span><div></div><div class="bar"><i style="width:${100*x.manureRevenue/max}%;background:#2d9c83"></i></div><span>${money(x.manureRevenue)} bán phân</span></div>`).join('')}
 function download(name,content,type){let a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
-$('exportBtn').onclick=()=>{let rows=[['Nhóm','Ngày','Mã ô/Thông tin','Số lượng','Chi tiết']];db.eggs.forEach(x=>rows.push(['Trứng',x.date1||x.date2,x.slot,+x.count1 + +x.count2,`Q1 ${x.date1}; Q2 ${x.date2}`]));db.pairings.forEach(x=>rows.push(['Ghép con',x.date,x.slots.join(' '),x.birds,`${x.nests} tổ`]));db.chicks.forEach(x=>rows.push(['Chim con',x.date,x.pairId,x.alive+x.dead,`Sống ${x.alive}; chết ${x.dead}; ${x.reason}`]));db.transfers.forEach(x=>rows.push(['Chuyển tổ',x.date,`${x.from} -> ${x.to}`,x.birds,x.note]));db.sales.forEach(x=>rows.push(['Bán',x.date,'Loại '+x.grade,x.qty,money(x.amount)]));db.manureSales.forEach(x=>rows.push(['Doanh thu phân chim',x.date,'Toàn trại','',money(x.amount)]));db.expenses.forEach(x=>rows.push(['Chi phí: '+x.category,x.date,x.name,x.qty,`${x.unit}; đơn giá ${x.price}; thành tiền ${x.amount}; ${x.note}`]));download('bao-cao-trai-chim.csv','\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n'),'text/csv;charset=utf-8')};
+$('exportBtn').onclick=()=>{let rows=[['Nhóm','Ngày','Mã ô/Thông tin','Số lượng','Chi tiết']];db.eggs.forEach(x=>rows.push(['Trứng',x.date1||x.date2,x.slot,+x.count1 + +x.count2,`Q1 ${x.date1}; Q2 ${x.date2}`]));db.eggPhotoLogs.forEach(x=>rows.push(['Trứng từ ảnh',x.date,'Ảnh chụp',x.count,x.note||'Số lượng người dùng xác nhận; AI chưa kết nối']));db.incubationDrops.forEach(x=>rows.push(['Bỏ ấp',x.date,x.slots.join(' '),x.slots.length,x.note||'']));db.pairings.forEach(x=>rows.push(['Ghép con',x.date,x.slots.join(' '),x.birds,`${x.nests} tổ`]));db.chicks.forEach(x=>rows.push(['Chim con',x.date,x.pairId,x.alive+x.dead,`Sống ${x.alive}; chết ${x.dead}; ${x.reason}`]));db.transfers.forEach(x=>rows.push(['Chuyển tổ',x.date,`${x.from} -> ${x.to}`,x.birds,x.note]));db.sales.forEach(x=>rows.push(['Bán',x.date,'Loại '+x.grade,x.qty,money(x.amount)]));db.manureSales.forEach(x=>rows.push(['Doanh thu phân chim',x.date,'Toàn trại','',money(x.amount)]));db.expenses.forEach(x=>rows.push(['Chi phí: '+x.category,x.date,x.name,x.qty,`${x.unit}; đơn giá ${x.price}; thành tiền ${x.amount}; ${x.note}`]));download('bao-cao-trai-chim.csv','\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n'),'text/csv;charset=utf-8')};
 $('backupBtn').onclick=()=>download('sao-luu-trai-chim-'+today()+'.json',JSON.stringify(db,null,2),'application/json');
-$('restoreFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x.coops||!x.sales)throw 0;x.expenses=x.expenses||[];x.manureSales=x.manureSales||[];if(confirm('Khôi phục sẽ thay thế dữ liệu hiện tại. Tiếp tục?')){db=x;db.expenses=db.expenses||[];save();alert('Đã khôi phục dữ liệu.')}}catch(_){alert('Tệp sao lưu không hợp lệ.')}};
+$('restoreFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x.coops||!x.sales)throw 0;x.expenses=x.expenses||[];x.manureSales=x.manureSales||[];if(confirm('Khôi phục sẽ thay thế dữ liệu hiện tại. Tiếp tục?')){db=normalizeDb(x);save();alert('Đã khôi phục dữ liệu.')}}catch(_){alert('Tệp sao lưu không hợp lệ.')}};
 $('clearBtn').onclick=()=>{if(confirm('Bạn chắc chắn muốn xóa toàn bộ dữ liệu đã nhập? Hãy tải sao lưu trước.')){db=blank();save()}};
-setDefaults();render();function friendlyError(e){
+setDefaults();render();
+
+function friendlyError(e){
  const code=e?.code||'';
  const map={
   'auth/invalid-email':'Email không đúng định dạng.',
@@ -278,7 +347,15 @@ async function startFirebase(){
    localKey='pigeonFarmDB_'+user.uid;
    const database=storeMod.getFirestore(firebaseApp);
    cloudRef=storeMod.doc(database,'users',user.uid,'farmData','complete');
+   bridgeRef=storeMod.doc(database,'users','1ePS2ZPFVpVyErE3L81CzJT6kPb2','farmData','appThaoV1');
    firestore={...storeMod,db:database};
+   if(bridgeUnsubscribe){bridgeUnsubscribe();bridgeUnsubscribe=null;}
+   bridgeUnsubscribe=storeMod.onSnapshot(bridgeRef,bridgeSnap=>{
+    if(!bridgeSnap.exists()){thaoData=null;renderThaoSync();return;}
+    const bridge=bridgeSnap.data()||{};
+    thaoData=bridge.thaoDB&&typeof bridge.thaoDB==='object'?bridge.thaoDB:bridge;
+    renderThaoSync();
+   },err=>{console.error('Lỗi nhận dữ liệu app Thảo:',err);setSync('Không đọc được dữ liệu app Thảo: '+friendlyError(err));});
    try{
     const snap=await storeMod.getDoc(cloudRef);
     if(snap.exists()){
@@ -295,6 +372,8 @@ async function startFirebase(){
      localStorage.setItem(localKey,JSON.stringify(db));
     }
     cloudReady=true;render();
+    try{await publishMainMirror(db);setSync('☁️ App chính đã kết nối và chia sẻ dữ liệu với app Thảo.');}
+    catch(bridgeError){setSync('App chính đã tải dữ liệu nhưng chưa gửi được sang app Thảo: '+friendlyError(bridgeError));console.error(bridgeError);}
    }catch(e){cloudReady=false;setSync('Không tải được dữ liệu: '+friendlyError(e));alert('Không tải được dữ liệu Firebase. Ứng dụng tạm khóa đồng bộ để tránh ghi đè dữ liệu cũ. Chi tiết: '+friendlyError(e));}
   });
  }catch(e){$('loginPanel').style.display='block';$('mainApp').style.display='none';$('loginMessage').textContent='Không khởi tạo được Firebase: '+friendlyError(e);console.error(e)}
