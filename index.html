@@ -72,7 +72,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 
 <section class="page" id="incubation"><h1>Theo dõi tổ ấp</h1><p class="sub">Ghi nhận theo từng ngày; bấm ngày trong lịch sử để xem mã ô đang ấp và chuẩn bị ghép chim con.</p>
 <div class="card"><form id="incForm"><div class="fields"><div><label>Ngày thống kê</label><input type="date" id="incDate" required></div><div><label>Danh sách mã ô đang ấp</label><input id="incSlots" placeholder="001, 002, 015" required></div><div><label>Số tổ ấp</label><input id="incCount" type="number" min="0" placeholder="Tự đếm nếu để trống"></div></div><div><label>Ghi chú</label><input id="incNote" placeholder="Ghi chú (không bắt buộc)"></div><div class="actions"><button>Lưu thống kê ngày</button></div></form></div>
-<div class="card"><h2>Nhập số con ghép ngay tại tổ ấp</h2><p class="hint">Mỗi mã tổ có một ô nhập riêng. Lưu tại đây sẽ tự tạo/cập nhật lịch ghép theo từng tổ và hiện ngay trong Ghép con, Kho ghép con. Ngày ghép tự lấy ngày hôm nay.</p><div class="tablewrap"><table><thead><tr><th>Mã tổ đang ấp</th><th>Số con ghép</th><th>Ngày ghép</th><th></th></tr></thead><tbody id="incPairInputRows"></tbody></table></div></div>
+<div class="card"><h2>Nhập số con ghép ngay tại tổ ấp</h2><p class="hint">Chọn ngày ấp để lọc danh sách tổ, sau đó bấm Lọc. Ngày ghép khi lưu luôn tự lấy ngày hiện tại.</p><div class="row" style="justify-content:flex-start;margin:10px 0"><div style="min-width:180px"><label for="incPairFilterDate">Ngày ấp cần lọc</label><input type="date" id="incPairFilterDate"></div><button type="button" onclick="filterIncPairInputs()" style="align-self:end">Lọc</button></div><div class="tablewrap"><table><thead><tr><th>Mã tổ đang ấp</th><th>Số con ghép</th><th>Ngày ghép</th><th></th></tr></thead><tbody id="incPairInputRows"></tbody></table></div></div>
 <div class="card"><h2>Bỏ ấp</h2><form id="dropIncForm"><div class="fields"><div><label>Ngày bỏ ấp</label><input type="date" id="dropIncDate" required></div><div><label>Mã ô bỏ ấp</label><input id="dropIncSlots" placeholder="001, 002, 015" required></div><div><label>Ghi chú</label><input id="dropIncNote" placeholder="Không bắt buộc"></div></div><div class="actions"><button type="submit" class="danger">Lưu bỏ ấp</button></div></form><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Mã ô bỏ ấp</th><th>Ghi chú</th><th></th></tr></thead><tbody id="dropIncRows"></tbody></table></div></div>
 <div class="card"><h2>Lịch sử tổ ấp</h2><div class="tablewrap"><table><thead><tr><th>Ngày</th><th>Số tổ ấp</th><th>Danh sách ô</th><th>Ghi chú</th><th></th></tr></thead><tbody id="incRows"></tbody></table></div></div></section>
 
@@ -155,6 +155,7 @@ const sortByTransfer=(rows)=>[...rows].sort((a,b)=>numericSort(a?.from,b?.from)|
 const $=id=>document.getElementById(id), today=()=>{let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}, fmt=n=>Number(n||0).toLocaleString('vi-VN'), money=n=>fmt(n)+' ₫', monthNow=()=>today().slice(0,7), parseList=s=>[...new Set((s||'').split(/[,;\s]+/).map(x=>x.trim()).filter(Boolean))];
 const blank=()=>({coops:Array.from({length:1800},(_,i)=>({id:String(i+1).padStart(3,'0'),status:'Trống',parents:'Bình thường'})),incubations:[],incubationDrops:[],raisingProfiles:[],eggPhotoLogs:[],incidents:[],eggs:[],pairings:[],chicks:[],transfers:[],sales:[],expenses:[],manureSales:[],prices:{1:170000,2:150000,3:130000}});
 let db=blank();
+let incPairFilteredDate='';
 let auth=null, authApi=null, firestore=null, currentUser=null, cloudReady=false, cloudRef=null;
 let saveQueue=Promise.resolve(), localKey='pigeonFarmDB';
 let thaoUnsubscribe=null, thaoLiveData=null;
@@ -182,7 +183,7 @@ function dateIn(d,a,b){return d>=a&&d<=b}
 function monthRange(m){return [m+'-01',m+'-31']}
 function sum(arr,key){return arr.reduce((s,x)=>s+Number(x[key]||0),0)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function setDefaults(){['incDay','incDate','dropIncDate','egg1Date','egg2Date','pairDate','incidentDate','chickDate','transferDate','saleDate','expenseDate','manureDate'].forEach(id=>{if($(id))$(id).value=today()});['eggMonth','transferMonth','salesMonth','expenseMonth','manureMonth'].forEach(id=>{if($(id))$(id).value=monthNow()});$('today').textContent=new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}
+function setDefaults(){['incDay','incDate','incPairFilterDate','dropIncDate','egg1Date','egg2Date','pairDate','incidentDate','chickDate','transferDate','saleDate','expenseDate','manureDate'].forEach(id=>{if($(id))$(id).value=today()});['eggMonth','transferMonth','salesMonth','expenseMonth','manureMonth'].forEach(id=>{if($(id))$(id).value=monthNow()});$('today').textContent=new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}
 function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));render()}
 $('nav').addEventListener('click',e=>{let b=e.target.closest('button[data-page]');if(b)page(b.dataset.page)});
 function byDate(list,d){return list.filter(x=>x.date===d)}
@@ -272,11 +273,30 @@ function openStatDetail(kind){
  if(kind==='chickMonth'){title='Lịch sử chim con trong tháng '+monthNow();rows=db.chicks.filter(x=>String(x.date||'').startsWith(monthNow())).sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${esc(x.slot||'—')}</td><td>${fmt(x.alive)}</td><td>${fmt(x.dead)}</td></tr>`);}
  el.style.display='block';let head=kind==='eggMonth'?'<th>Mã ô</th><th>Quả 1</th><th>Quả 2</th><th>Ghi chú</th>':kind==='pairMonth'?'<th>Ngày</th><th>Mã tổ</th><th>Số con</th><th>Ghi chú</th>':kind==='chickMonth'?'<th>Ngày</th><th>Mã tổ</th><th>Sống</th><th>Chết</th>':'<th>Mã ô</th><th>Trạng thái</th><th>Số con / tuổi</th><th>Bố mẹ</th>';el.innerHTML=`<div class="row"><b>${title}</b><button class="secondary miniAction" onclick="document.getElementById('statDetailPanel').style.display='none'">Đóng</button></div><div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.join('')||'<tr><td colspan="4">Không có dữ liệu</td></tr>'}</tbody></table></div>`;
 }
+function filterIncPairInputs(){
+ const date=$('incPairFilterDate')?.value||'';
+ if(!date){alert('Vui lòng chọn ngày ấp trước khi lọc.');return;}
+ incPairFilteredDate=date;
+ renderIncPairInputs();
+}
 function renderIncPairInputs(){
  const el=$('incPairInputRows');if(!el)return;
- const latest=[...db.incubations].sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
- const slots=(latest?.slots||[]).map(x=>String(x).padStart(3,'0')).filter(slot=>{let dropped=(db.incubationDrops||[]).some(d=>(d.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)&&String(d.date)>=String(latest?.date||''));let p=db.pairings.filter(p=>(p.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];return !dropped&&(!p||String(p.date)<String(latest?.date||''));}).sort(numericSort);
- el.innerHTML=slots.map(slot=>{let last=db.pairings.filter(p=>(p.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0],counts=last?pairingSlotCounts(last):{},val=Object.prototype.hasOwnProperty.call(counts,slot)?counts[slot]:3;return `<tr><td><b>${esc(slot)}</b></td><td><div style="display:flex;align-items:center;gap:6px;white-space:nowrap"><button type="button" class="secondary miniAction" onclick="stepIncPairCount('${slot}',-1)">−</button><input class="quickInput" id="incPairQty_${slot}" type="number" min="0" step="1" value="${val}" style="width:58px;text-align:center"><button type="button" class="secondary miniAction" onclick="stepIncPairCount('${slot}',1)">+</button></div></td><td>${today()}</td><td><button type="button" class="secondary miniAction" onclick="saveIncPairCount('${slot}')">Lưu</button></td></tr>`}).join('')||'<tr><td colspan="4">Không có tổ đang ấp chờ ghép trong danh sách mới nhất.</td></tr>';
+ if(!incPairFilteredDate){
+  el.innerHTML='<tr><td colspan="4">Chọn ngày ấp phía trên rồi bấm Lọc để hiện danh sách tổ.</td></tr>';
+  return;
+ }
+ const selected=db.incubations.find(x=>String(x.date)===incPairFilteredDate);
+ const slots=(selected?.slots||[]).map(x=>String(x).padStart(3,'0')).filter(slot=>{
+  let dropped=(db.incubationDrops||[]).some(d=>(d.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)&&String(d.date)>=incPairFilteredDate);
+  let p=db.pairings.filter(p=>(p.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+  return !dropped&&(!p||String(p.date)<incPairFilteredDate);
+ }).sort(numericSort);
+ el.innerHTML=slots.map(slot=>{
+  let last=db.pairings.filter(p=>(p.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0],
+      counts=last?pairingSlotCounts(last):{},
+      val=Object.prototype.hasOwnProperty.call(counts,slot)?counts[slot]:3;
+  return `<tr><td><b>${esc(slot)}</b></td><td><div style="display:flex;align-items:center;gap:6px;white-space:nowrap"><button type="button" class="secondary miniAction" onclick="stepIncPairCount('${slot}',-1)">−</button><input class="quickInput" id="incPairQty_${slot}" type="number" min="0" step="1" value="${val}" style="width:58px;text-align:center"><button type="button" class="secondary miniAction" onclick="stepIncPairCount('${slot}',1)">+</button></div></td><td>${today()}</td><td><button type="button" class="secondary miniAction" onclick="saveIncPairCount('${slot}')">Lưu</button></td></tr>`;
+ }).join('')||`<tr><td colspan="4">${selected?'Ngày '+esc(incPairFilteredDate)+' không có tổ đang ấp chờ ghép.':'Không có dữ liệu tổ ấp cho ngày '+esc(incPairFilteredDate)+'.'}</td></tr>`;
 }
 function stepIncPairCount(slot,delta){
  const input=$('incPairQty_'+slot);
