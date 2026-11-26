@@ -54,7 +54,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 <header><div><strong>🐦 TRẠI CHIM CÂU</strong><br><small>Hệ thống quản lý 1.800 ô</small></div><div style="text-align:right"><small id="today"></small><br><small id="syncStatus">Đang kết nối...</small> <button type="button" class="secondary" style="padding:5px 8px;font-size:11px" onclick="logout()">Đăng xuất</button></div></header>
 <div class="layout">
 <aside><div class="brand">🐦 Trại chim câu<br><small>Quản lý khoa học</small></div><nav id="nav">
-<button class="active" data-page="overview">⌂ Tổng quan</button><button data-page="coops">▦ Quản lý ô</button><button data-page="incubation">🥚 Theo dõi tổ ấp</button><button data-page="raising">🐣 Ưu tiên nuôi con</button><button data-page="eggs">◉ Theo dõi trứng</button><button data-page="pairing">♡ Ghép con</button><button data-page="pairingVault">📦 Kho ghép con</button><button data-page="issues">🚨 Cảnh báo</button><button data-page="chicks">🐣 Chim con</button><button data-page="transfers">⇄ Chuyển tổ</button><button data-page="sales">▣ Chim bán</button><button data-page="expenses">💸 Chi phí</button><button data-page="reports">▥ Thống kê</button><button data-page="settings">⚙ Cài đặt</button>
+<button class="active" data-page="overview">⌂ Tổng quan</button><button data-page="coops">▦ Quản lý ô</button><button data-page="incubation">🥚 Theo dõi tổ ấp</button><button data-page="raising">🐣 Ưu tiên nuôi con</button><button data-page="eggs">◉ Theo dõi trứng</button><button data-page="pairing">♡ Ghép con</button><button data-page="pairingVault">📦 Kho ghép con</button><button data-page="issues">🚨 Cảnh báo</button><button data-page="chicks">🐣 Chim con</button><button data-page="transfers">⇄ Chuyển tổ</button><button data-page="sales">▣ Chim bán</button><button data-page="expenses">💸 Chi phí</button><button data-page="reports">▥ Thống kê</button><button data-page="incubationPlan">📋 KẾ HOẠCH ẤP</button><button data-page="settings">⚙ Cài đặt</button>
 </nav></aside>
 <main>
 <section class="page active" id="overview">
@@ -150,6 +150,13 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 
 
 
+
+<section class="page" id="incubationPlan"><h1>📋 KẾ HOẠCH ẤP</h1><p class="sub">Hệ thống đề xuất theo số trứng, tỷ lệ nở và lịch sử nuôi con. Chủ trại là người duyệt cuối cùng; app không tự đưa tổ vào ấp.</p>
+<div class="card"><h2>🎯 Mục tiêu ấp mỗi ngày</h2><div class="fields"><div><label>Mục tiêu trứng/ngày</label><input id="planEggTarget" type="number" min="1" step="1" value="100"></div><div><label>Tỷ lệ nở dự kiến (%)</label><input id="planHatchRate" type="number" min="1" max="100" step="1" value="70"></div><div><label>Số chim nhận nuôi tốt / ô</label><input id="planChicksPerNest" type="number" min="1" step="1" value="3"></div><div><label>Ngày xem kế hoạch</label><input id="planDate" type="date"></div></div><div id="planCalculation" class="notice"></div><p class="hint">Ví dụ: 100 trứng × 70% = 70 chim dự kiến; 70 ÷ 3 con/ô = 24 ô (làm tròn lên). Chỉ tổ có đủ từ 2 trứng mới được đề xuất.</p></div>
+<div class="card"><div class="row"><h2>Danh sách kế hoạch</h2><select id="planFilter"><option value="all">Tất cả</option><option value="proposed">Danh sách đề xuất ấp</option><option value="approved">Đã duyệt ấp</option><option value="waiting">Chờ đẻ</option><option value="reserved">Tổ giữ lại chuyên đẻ</option><option value="history">Lịch sử thay thế tổ</option></select><input id="planSearchDate" type="date" aria-label="Lọc ngày trứng" title="Lọc theo ngày trứng"></div><div id="planKpis" class="grid"></div><div class="tablewrap"><table><thead><tr><th>Mã tổ</th><th>Ngày đẻ</th><th>Số trứng</th><th>Đánh giá nuôi con</th><th>Lịch sử nuôi / tỷ lệ sống</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="planRows"></tbody></table></div><p class="hint" id="planFootnote">Tổ được ưu tiên theo chất lượng nuôi con, tỷ lệ sống và khả năng nhận nuôi 3 con; mã tổ sắp xếp tăng dần khi cùng mức ưu tiên.</p></div>
+<div class="card"><h2>🌱 Tổ giữ lại chuyên đẻ</h2><p class="hint">Các tổ được giữ lại sẽ không tự xuất hiện trong danh sách đề xuất ấp. Có thể bỏ giữ lại khi cần.</p><div class="tablewrap"><table><thead><tr><th>Mã tổ</th><th>Ngày đánh dấu</th><th>Ghi chú</th><th></th></tr></thead><tbody id="planReservedRows"></tbody></table></div></div>
+<div class="card"><h2>🕘 Lịch sử duyệt / từ chối / thay thế</h2><div class="tablewrap"><table><thead><tr><th>Thời gian</th><th>Mã tổ</th><th>Quyết định</th><th>Lý do</th><th>Tổ thay thế</th></tr></thead><tbody id="planHistoryRows"></tbody></table></div></div>
+</section>
 <section class="page" id="settings"><h1>Cài đặt & dữ liệu</h1><p class="sub">Cấu hình quy mô trại và bảo vệ dữ liệu đang lưu.</p>
 <div class="card"><h2>💾 Sao lưu và xuất file</h2><p class="notice">Bản sao lưu JSON chứa dữ liệu App chính và bản dữ liệu App Thảo mà App chính đang đọc được. Hãy tải file về iPhone hoặc lưu thêm lên iCloud/Google Drive.</p><div class="actions"><button type="button" id="settingsBackupBtn">Tải bản sao lưu JSON</button><button type="button" class="secondary" id="settingsExcelBtn">Xuất sổ Excel</button><label class="btn secondary" style="display:inline-flex;align-items:center">Khôi phục từ JSON<input type="file" id="settingsRestoreFile" accept=".json,application/json" style="display:none"></label></div><p class="hint" id="backupStatus">Sao lưu tự động trên thiết bị: sẽ tạo bản theo ngày khi mở app và tải dữ liệu Firebase thành công.</p></div>
 <div class="card"><h2>Quy mô trại</h2><p>Hệ thống khởi tạo sẵn 1.800 mã ô từ 001 đến 1800.</p><p class="notice">Dữ liệu trại chim chính được lưu trên Firebase. Dữ liệu nghiệp vụ phù hợp từ app Thảo sẽ được đưa vào đúng mục tương ứng; các loại dữ liệu khác nghĩa sẽ được hiển thị trong chính mục nghiệp vụ liên quan, không tự quy đổi sai.</p><button class="danger" id="clearBtn">Xóa toàn bộ dữ liệu đã nhập và khởi tạo lại 1.800 ô</button></div></section>
@@ -160,7 +167,7 @@ const numericSort=(a,b)=>{const x=String(a??'').trim(),y=String(b??'').trim();co
 const sortBySlot=(rows,key='slot')=>[...rows].sort((a,b)=>numericSort(a?.[key],b?.[key])||String(a?.date||'').localeCompare(String(b?.date||'')));
 const sortByTransfer=(rows)=>[...rows].sort((a,b)=>numericSort(a?.from,b?.from)||numericSort(a?.to,b?.to)||String(a?.date||'').localeCompare(String(b?.date||'')));
 const $=id=>document.getElementById(id), today=()=>{let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}, fmt=n=>Number(n||0).toLocaleString('vi-VN'), money=n=>fmt(n)+' ₫', monthNow=()=>today().slice(0,7), parseList=s=>[...new Set((s||'').split(/[,;\s]+/).map(x=>x.trim()).filter(Boolean))];
-const blank=()=>({coops:Array.from({length:1800},(_,i)=>({id:String(i+1).padStart(3,'0'),status:'Trống',parents:'Bình thường'})),incubations:[],incubationDrops:[],raisingProfiles:[],eggPhotoLogs:[],incidents:[],issues:[],eggs:[],pairings:[],chicks:[],transfers:[],sales:[],expenses:[],manureSales:[],prices:{1:170000,2:150000,3:130000}});
+const blank=()=>({coops:Array.from({length:1800},(_,i)=>({id:String(i+1).padStart(3,'0'),status:'Trống',parents:'Bình thường'})),incubations:[],incubationDrops:[],raisingProfiles:[],eggPhotoLogs:[],incidents:[],issues:[],eggs:[],pairings:[],chicks:[],transfers:[],sales:[],expenses:[],manureSales:[],incubationPlans:[],prices:{1:170000,2:150000,3:130000}});
 let db=blank();
 let incPairFilteredDate='';
 let auth=null, authApi=null, firestore=null, currentUser=null, cloudReady=false, cloudRef=null;
@@ -169,7 +176,7 @@ let thaoUnsubscribe=null, thaoLiveData=null;
 const THAO_UID='1ePS2ZPFVpVyErE3L81CzJT6kPb2';
 function normalizeDb(value){
  const base=blank(); if(!value||typeof value!=='object')return base;
- for(const key of ['coops','incubations','incubationDrops','raisingProfiles','eggPhotoLogs','incidents','issues','eggs','pairings','chicks','transfers','sales','expenses','manureSales']) if(Array.isArray(value[key]))base[key]=value[key];
+ for(const key of ['coops','incubations','incubationDrops','raisingProfiles','eggPhotoLogs','incidents','issues','eggs','pairings','chicks','transfers','sales','expenses','manureSales','incubationPlans']) if(Array.isArray(value[key]))base[key]=value[key];
  if(value.prices&&typeof value.prices==='object')base.prices={...base.prices,...value.prices};
  if(base.coops.length!==1800){const old=new Map(base.coops.map(x=>[String(x.id).padStart(3,'0'),x]));base.coops=Array.from({length:1800},(_,i)=>old.get(String(i+1).padStart(3,'0'))||({id:String(i+1).padStart(3,'0'),status:'Trống',parents:'Bình thường'}));}
  return base;
@@ -190,7 +197,7 @@ function dateIn(d,a,b){return d>=a&&d<=b}
 function monthRange(m){return [m+'-01',m+'-31']}
 function sum(arr,key){return arr.reduce((s,x)=>s+Number(x[key]||0),0)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function setDefaults(){['incDay','incDate','incPairFilterDate','dropIncDate','egg1Date','egg2Date','pairDate','incidentDate','issueDate','chickDate','transferDate','saleDate','expenseDate','manureDate'].forEach(id=>{if($(id))$(id).value=today()});['eggMonth','transferMonth','salesMonth','expenseMonth','manureMonth'].forEach(id=>{if($(id))$(id).value=monthNow()});$('today').textContent=new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}
+function setDefaults(){['incDay','incDate','incPairFilterDate','dropIncDate','egg1Date','egg2Date','pairDate','incidentDate','issueDate','chickDate','transferDate','saleDate','expenseDate','manureDate','planDate'].forEach(id=>{if($(id))$(id).value=today()});['eggMonth','transferMonth','salesMonth','expenseMonth','manureMonth'].forEach(id=>{if($(id))$(id).value=monthNow()});$('today').textContent=new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}
 function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));render()}
 $('nav').addEventListener('click',e=>{let b=e.target.closest('button[data-page]');if(b)page(b.dataset.page)});
 function byDate(list,d){return list.filter(x=>x.date===d)}
@@ -305,7 +312,72 @@ renderReports();
  renderThaoSections();
  renderTableTotals();
  refreshTableFilters();
+ renderIncubationPlan();
 }
+function planLatestDecision(slot){return [...(db.incubationPlans||[])].filter(x=>String(x.slot).padStart(3,'0')===slot).sort((a,b)=>String(b.decidedAt||b.createdAt||'').localeCompare(String(a.decidedAt||a.createdAt||'')))[0]||null}
+function planCandidateRows(){
+ const reserved=new Set((db.incubationPlans||[]).filter(x=>x.status==='reserved').map(x=>String(x.slot).padStart(3,'0')));
+ const candidates=[];
+ db.eggs.forEach(e=>{
+  const slot=String(e.slot||'').padStart(3,'0'), count=(Number(e.count1)||0)+(Number(e.count2)||0), eggDate=[e.date1,e.date2].filter(Boolean).sort().at(-1)||'';
+  if(!slot||!eggDate||count<2||reserved.has(slot))return;
+  const coop=db.coops.find(c=>c.id===slot);if(!coop)return;
+  const latestInc=[...(db.incubations||[])].filter(r=>(r.slots||[]).some(x=>String(x).padStart(3,'0')===slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+  const latestDrop=[...(db.incubationDrops||[])].filter(r=>(r.slots||[]).some(x=>String(x).padStart(3,'0')===slot)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+  if(['Đang ấp','Ấp và nuôi con','Đang nuôi con'].includes(coop.status))return;
+  if(latestInc&&latestInc.date>=eggDate&&(!latestDrop||latestDrop.date<latestInc.date))return;
+  if(latestDrop&&latestDrop.date>=eggDate)return;
+  const decision=planLatestDecision(slot);if(decision&&['approved','rejected','reserved'].includes(decision.status)&&String(decision.eggDate||'')===eggDate)return;
+  const profile=(db.raisingProfiles||[]).find(x=>String(x.slot).padStart(3,'0')===slot)||{};
+  const pairList=(db.pairings||[]).filter(p=>(p.slots||[]).some(x=>String(x).padStart(3,'0')===slot));
+  let alive=0,dead=0,three=0;
+  pairList.forEach(p=>{const ch=(db.chicks||[]).filter(c=>c.pairId===p.id);ch.forEach(c=>{alive+=Number(c.alive)||0;dead+=Number(c.dead)||0;if((Number(c.alive)||0)>=3)three++})});
+  const total=alive+dead,rate=total?alive/total:0,quality=profile.quality||'normal';
+  const score=(quality==='good'?100:quality==='normal'?50:0)+(total?rate*40:0)+(three?10:0)+(count>=2?5:0);
+  candidates.push({slot,eggDate,count,note:e.note||'',quality,qualityText:quality==='good'?'Nuôi tốt – ưu tiên':quality==='poor'?'Nuôi kém':'Bình thường',alive,dead,rate,total,score,coop});
+ });
+ const bySlot=new Map();candidates.forEach(c=>{const old=bySlot.get(c.slot);if(!old||c.eggDate>old.eggDate)bySlot.set(c.slot,c)});
+ return [...bySlot.values()].sort((a,b)=>b.score-a.score||numericSort(a.slot,b.slot));
+}
+function planApprove(slot,eggDate){
+ const c=planCandidateRows().find(x=>x.slot===slot&&x.eggDate===eggDate);if(!c)return alert('Tổ này không còn đủ điều kiện đề xuất ấp.');
+ (db.incubationPlans||(db.incubationPlans=[])).push({id:id(),slot,eggDate,eggCount:c.count,status:'approved',createdAt:new Date().toISOString(),decidedAt:new Date().toISOString(),decisionBy:currentUser?.email||'Chủ trại',note:'Chủ trại duyệt ấp'});
+ save();
+}
+function planReject(slot,eggDate){
+ const reason=prompt('Lý do từ chối tổ '+slot+' (bắt buộc):');if(reason===null)return;if(!reason.trim())return alert('Vui lòng nhập lý do từ chối.');
+ const c=planCandidateRows().find(x=>x.slot===slot&&x.eggDate===eggDate);if(!c)return alert('Tổ này không còn trong danh sách đề xuất.');
+ (db.incubationPlans||(db.incubationPlans=[])).push({id:id(),slot,eggDate,eggCount:c.count,status:'rejected',reason:reason.trim(),createdAt:new Date().toISOString(),decidedAt:new Date().toISOString(),decisionBy:currentUser?.email||'Chủ trại'});
+ save();alert('Đã từ chối tổ '+slot+'. Danh sách sẽ tự đưa tổ ưu tiên tiếp theo vào thay thế nếu còn tổ đủ điều kiện.');
+}
+function planReserve(slot,eggDate){
+ const c=planCandidateRows().find(x=>x.slot===slot&&x.eggDate===eggDate);if(!c)return alert('Không tìm thấy tổ phù hợp.');
+ const note=prompt('Ghi chú giữ tổ '+slot+' chuyên đẻ (có thể để trống):','Giữ lại chuyên đẻ');if(note===null)return;
+ (db.incubationPlans||(db.incubationPlans=[])).push({id:id(),slot,eggDate,status:'reserved',reason:note.trim(),createdAt:new Date().toISOString(),decidedAt:new Date().toISOString(),decisionBy:currentUser?.email||'Chủ trại'});save();
+}
+function planUnreserve(slot){const rec=[...(db.incubationPlans||[])].filter(x=>String(x.slot).padStart(3,'0')===slot&&x.status==='reserved').sort((a,b)=>String(b.decidedAt||'').localeCompare(String(a.decidedAt||'')))[0];if(!rec)return;rec.status='released';rec.decidedAt=new Date().toISOString();rec.reason=(rec.reason||'')+' · Bỏ giữ lại';save()}
+function renderIncubationPlan(){
+ const rows=$('planRows');if(!rows)return;
+ const target=Math.max(1,Number($('planEggTarget')?.value)||100),hatch=Math.min(100,Math.max(1,Number($('planHatchRate')?.value)||70)),per=Math.max(1,Number($('planChicksPerNest')?.value)||3),expected=Math.floor(target*hatch/100),needed=Math.ceil(expected/per),approved=(db.incubationPlans||[]).filter(x=>x.status==='approved').length,remaining=Math.max(0,needed-approved);
+ $('planCalculation').innerHTML=`<b>${fmt(target)} trứng/ngày</b> × ${fmt(hatch)}% = <b>${fmt(expected)} chim dự kiến</b>; ${fmt(expected)} ÷ ${fmt(per)} con/ô = <b>${fmt(needed)} ô cần ấp</b>. Đã duyệt: ${fmt(approved)} · Còn cần: ${fmt(remaining)} ô.`;
+ const allCandidates=planCandidateRows(),dateFilter=$('planSearchDate')?.value||'',candidates=allCandidates.filter(x=>!dateFilter||x.eggDate===dateFilter),filter=$('planFilter')?.value||'all';
+ const reserved=(db.incubationPlans||[]).filter(x=>x.status==='reserved'&&(!dateFilter||x.eggDate===dateFilter));
+ const approvedRows=(db.incubationPlans||[]).filter(x=>x.status==='approved'&&(!dateFilter||x.eggDate===dateFilter));
+ const rejectedRows=(db.incubationPlans||[]).filter(x=>x.status==='rejected'&&(!dateFilter||x.eggDate===dateFilter));
+ const waiting=db.coops.filter(c=>c.status==='Chờ đẻ').sort((a,b)=>numericSort(a.id,b.id));
+ let display=[];
+ if(filter==='proposed')display=candidates.slice(0,remaining);
+ else if(filter==='approved')display=approvedRows.map(x=>({slot:String(x.slot).padStart(3,'0'),eggDate:x.eggDate,count:x.eggCount||0,qualityText:'Đã được chủ trại duyệt',status:'approved',decision:x}));
+ else if(filter==='waiting')display=waiting.map(c=>({slot:c.id,eggDate:'—',count:0,qualityText:'—',status:'waiting',coop:c}));
+ else if(filter==='reserved')display=reserved.map(x=>({slot:String(x.slot).padStart(3,'0'),eggDate:x.eggDate||'—',count:x.eggCount||0,qualityText:'Giữ lại chuyên đẻ',status:'reserved',decision:x}));
+ else if(filter==='history')display=rejectedRows.map(x=>({slot:String(x.slot).padStart(3,'0'),eggDate:x.eggDate,count:x.eggCount||0,qualityText:'Đã từ chối',status:'rejected',decision:x}));
+ else display=[...candidates.slice(0,remaining).map(x=>({...x,status:'proposed'})),...approvedRows.map(x=>({slot:String(x.slot).padStart(3,'0'),eggDate:x.eggDate,count:x.eggCount||0,qualityText:'Đã được chủ trại duyệt',status:'approved',decision:x}))];
+ $('planKpis').innerHTML=[['Mục tiêu số ô',needed],['Đã duyệt',approved],['Còn cần duyệt',remaining],['Tổ đủ điều kiện đang chờ',candidates.length],['Giữ lại chuyên đẻ',reserved.length],['Chờ đẻ',waiting.length]].map(x=>`<div class="card kpi"><label>${x[0]}</label><b style="font-size:20px">${fmt(x[1])}</b></div>`).join('');
+ rows.innerHTML=display.map(x=>{const hist=x.total?`${fmt(x.alive)} sống / ${fmt(x.dead)} chết · ${Math.round(x.rate*100)}% sống`: 'Chưa có dữ liệu nuôi con';let actions='—';if(x.status==='proposed')actions=`<button type="button" onclick="planApprove('${x.slot}','${x.eggDate}')">Duyệt ấp</button> <button type="button" class="danger" onclick="planReject('${x.slot}','${x.eggDate}')">Từ chối</button> <button type="button" class="secondary" onclick="planReserve('${x.slot}','${x.eggDate}')">Giữ chuyên đẻ</button>`;else if(x.status==='reserved')actions=`<button type="button" class="secondary" onclick="planUnreserve('${x.slot}')">Bỏ giữ lại</button>`;return `<tr><td><b>${esc(x.slot)}</b></td><td>${esc(x.eggDate||'—')}</td><td>${fmt(x.count||0)}</td><td>${esc(x.qualityText||'—')}</td><td>${esc(hist)}</td><td>${x.status==='proposed'?'<span class="pill gold">Chờ chủ duyệt</span>':x.status==='approved'?'<span class="pill">Đã duyệt</span>':x.status==='waiting'?'<span class="pill blue">Chờ đẻ</span>':x.status==='reserved'?'<span class="pill">Giữ chuyên đẻ</span>':'<span class="pill red">Đã từ chối</span>'}</td><td>${actions}</td></tr>`}).join('')||'<tr><td colspan="7">Không có tổ phù hợp trong bộ lọc này.</td></tr>';
+ $('planReservedRows').innerHTML=reserved.map(x=>`<tr><td><b>${esc(String(x.slot).padStart(3,'0'))}</b></td><td>${esc((x.decidedAt||'').slice(0,10)||'—')}</td><td>${esc(x.reason||'Giữ lại chuyên đẻ')}</td><td><button type="button" class="secondary" onclick="planUnreserve('${String(x.slot).padStart(3,'0')}')">Bỏ giữ lại</button></td></tr>`).join('')||'<tr><td colspan="4">Chưa có tổ nào được giữ lại chuyên đẻ.</td></tr>';
+ $('planHistoryRows').innerHTML=[...(db.incubationPlans||[])].filter(x=>['approved','rejected','released'].includes(x.status)).sort((a,b)=>String(b.decidedAt||'').localeCompare(String(a.decidedAt||''))).map(x=>`<tr><td>${esc((x.decidedAt||x.createdAt||'').replace('T',' ').slice(0,16))}</td><td><b>${esc(String(x.slot).padStart(3,'0'))}</b></td><td>${x.status==='approved'?'Đã duyệt':x.status==='rejected'?'Từ chối':'Bỏ giữ lại'}</td><td>${esc(x.reason||x.note||'—')}</td><td>${x.status==='rejected'?'Tổ ưu tiên kế tiếp được đưa vào danh sách đề xuất':'—'}</td></tr>`).join('')||'<tr><td colspan="5">Chưa có lịch sử quyết định.</td></tr>';
+}
+$('planEggTarget')?.addEventListener('input',renderIncubationPlan);$('planHatchRate')?.addEventListener('input',renderIncubationPlan);$('planChicksPerNest')?.addEventListener('input',renderIncubationPlan);$('planDate')?.addEventListener('change',renderIncubationPlan);$('planFilter')?.addEventListener('change',renderIncubationPlan);$('planSearchDate')?.addEventListener('change',renderIncubationPlan);
 function daysBetween(a,b){if(!a||!b)return 0;return Math.floor((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/86400000)}
 function pairingSlotCounts(p){
  const slots=(p.slots||[]).map(x=>String(x).padStart(3,'0'));
@@ -497,6 +569,7 @@ function exportExcelWorkbook(){
  ['Ghep con',[['Ngày xác nhận','Số tổ','Số chim','Mã ô','Kiểm tra ngày 3','Ngày kiểm tra 3','Kiểm tra ngày 5','Ngày kiểm tra 5','Ghi chú'],...db.pairings.map(x=>[x.date,x.nests,x.birds,[...(x.slots||[])].sort(numericSort).join(', '),x.checkDay3Done?'Đã kiểm tra':'Chưa',x.checkDay3Date||'',x.checkDay5Done?'Đã kiểm tra':'Chưa',x.checkDay5Date||'',x.note])]],
  ['Su co',[['Ngày','Mã ô','Loại sự cố','Số chim ảnh hưởng','Bố mẹ','Người ghi','Xử lý','Ghi chú'],...(db.incidents||[]).map(x=>[x.date,x.slot,x.type,x.count,x.parents,x.reporter,x.action,x.note])]],
  ['Canh bao',[['Ngày','Mã tổ','Vấn đề','Trạng thái','Người ghi','Biện pháp','Ghi chú'],...(db.issues||[]).map(x=>[x.date,x.slot,issueTypeName(x.type),issueStatusName(x.status),x.reporter,x.action,x.note])]],
+ ['Ke hoach ap',[['Thời gian','Mã tổ','Ngày trứng','Số trứng','Quyết định','Lý do'],...(db.incubationPlans||[]).map(x=>[x.decidedAt||x.createdAt,x.slot,x.eggDate,x.eggCount,x.status,x.reason||''])]],
  ['Chim con',[['Ngày cập nhật','Ngày ghép','Số sống','Số chết','Lý do','Ghi chú'],...db.chicks.map(x=>{let p=db.pairings.find(p=>p.id===x.pairId);return [x.date,p?.date||'',x.alive,x.dead,x.reason,x.note]})]],
  ['Chuyen to',[['Ngày','Tổ cũ','Tổ mới','Số chim','Ghi chú'],...db.transfers.map(x=>[x.date,x.from,x.to,x.birds,x.note])]],
  ['Ban chim',[['Ngày','Phân loại','Số lượng','Đơn giá','Thành tiền','Mã ô','Ghi chú'],...db.sales.map(x=>[x.date,x.grade,x.qty,x.price,x.amount,x.slot,x.note])]],
