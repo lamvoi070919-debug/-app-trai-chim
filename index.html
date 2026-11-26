@@ -65,7 +65,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
 <div class="card"><h2>🐣 Dự kiến chim bán</h2><div id="forecastSummary"></div><div class="notice">Ngày bắt đầu bán dự kiến = ngày ghép + 25 ngày; hạn bán muộn nhất = ngày ghép + 30 ngày.</div></div>
 </div>
 <div class="card"><h2>🚨 Cảnh báo bất thường</h2><p class="hint">Các vấn đề chưa xử lý hiển thị đỏ; đang theo dõi hiển thị vàng; đã khắc phục hiển thị xanh.</p><div id="issueDashboard"></div><div class="actions"><button type="button" onclick="page('issues')">Mở sổ theo dõi vấn đề</button></div></div>
-<div class="card"><h2>⏰ Lịch nhắc ấp và ghép con</h2><p class="hint">Mốc ấp tính từ ngày đầu tiên ghi nhận ô trong danh sách ấp. Ngày 16–18 cần kiểm tra nở; chỉ khi xác nhận ghép thực tế mới bắt đầu lịch kiểm tra ngày 3–5.</p><div id="breedingAlerts"></div></div>
+<div class="card"><h2>⏰ Chú ý – Nhắc ghép con và kiểm tra</h2><p class="hint">Các nhắc nhở hiển thị tại Tổng quan, mã tổ được xếp theo thứ tự số từ nhỏ đến lớn.</p><div id="breedingAlerts"></div></div>
 <div class="card"><h2>📈 Sản lượng tháng hiện tại</h2><div id="monthSummary" class="grid"></div></div>
 </section>
 
@@ -397,12 +397,40 @@ function renderIssues(){
 function setIssueStatus(issueId,status){let rec=(db.issues||[]).find(x=>x.id===issueId);if(!rec)return;rec.history=Array.isArray(rec.history)?rec.history:[];rec.history.push({date:today(),from:rec.status||'open',to:status,at:new Date().toISOString()});rec.status=status;rec.statusUpdatedAt=new Date().toISOString();save();}
 function renderBreedingAlerts(){
  const todayStr=today(), firstBySlot=new Map();
- [...db.incubations].sort((a,b)=>a.date.localeCompare(b.date)).forEach(rec=>(rec.slots||[]).forEach(slot=>{let key=String(slot).padStart(3,'0');if(!firstBySlot.has(key))firstBySlot.set(key,rec.date)}));
- const pairBySlot=new Map();db.pairings.forEach(p=>(p.slots||[]).forEach(slot=>{let key=String(slot).padStart(3,'0'),old=pairBySlot.get(key);if(!old||p.date>old.date)pairBySlot.set(key,p)}));
- let items=[];
- firstBySlot.forEach((start,slot)=>{let age=daysBetween(start,todayStr),paired=pairBySlot.get(slot);let dropped=(db.incubationDrops||[]).some(d=>d.date>=start&&(d.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot));if(dropped&&!paired)return;if(paired&&paired.date>=start)return;if(age>=16&&age<=18)items.push({level:age>=17?'red':'yellow',text:`Ô ${slot}: ngày ấp ${age} — kiểm tra nở và chuẩn bị ghép con`,date:start});else if(age>18)items.push({level:'red',text:`Ô ${slot}: đã qua ${age} ngày ấp, chưa có xác nhận ghép — cần kiểm tra và cập nhật kết quả`,date:start});});
- db.pairings.forEach(p=>{let age=daysBetween(p.date,todayStr);if(age>=3&&!p.checkDay3Done)items.push({level:age>5?'red':'yellow',text:`Đợt ghép ${p.date} (${[...(p.slots||[])].sort(numericSort).join(', ')||p.nests+' tổ'}): đến lịch kiểm tra sau ghép ngày 3`,pair:p.id});if(age>=5&&!p.checkDay5Done)items.push({level:'red',text:`Đợt ghép ${p.date}: đến lịch kiểm tra ưu tiên ngày 5, cần xác nhận kết quả`,pair:p.id});});
- const el=$('breedingAlerts');if(!el)return;el.innerHTML=items.length?items.sort((a,b)=>(a.level==='red'?-1:1)).map(x=>`<div class="notice" style="border-left:4px solid ${x.level==='red'?'#c62828':'#e6a23c'};margin:7px 0"><b>${x.level==='red'?'CẦN XỬ LÝ':'SẮP ĐẾN HẠN'}</b> · ${esc(x.text)}${x.pair?` <button class="secondary" onclick="page('pairing')">Mở ghép con</button>`:''}</div>`).join(''):'<p class="muted">Hiện chưa có lịch nhắc cần xử lý.</p>';
+ [...db.incubations].sort((a,b)=>a.date.localeCompare(b.date)).forEach(rec=>(rec.slots||[]).forEach(slot=>{
+  const key=String(slot).padStart(3,'0');
+  if(!firstBySlot.has(key))firstBySlot.set(key,rec.date);
+ }));
+ const pairBySlot=new Map();
+ db.pairings.forEach(p=>(p.slots||[]).forEach(slot=>{
+  const key=String(slot).padStart(3,'0'),old=pairBySlot.get(key);
+  if(!old||p.date>old.date)pairBySlot.set(key,p);
+ }));
+ const items=[];
+ firstBySlot.forEach((start,slot)=>{
+  const age=daysBetween(start,todayStr),paired=pairBySlot.get(slot);
+  const dropped=(db.incubationDrops||[]).some(d=>d.date>=start&&(d.slots||[]).map(x=>String(x).padStart(3,'0')).includes(slot));
+  if(dropped&&!paired)return;
+  if(paired&&paired.date>=start)return;
+  if(age>=16&&age<=18)items.push({level:age>=17?'red':'yellow',slot,date:start,text:`Tổ ${slot}: ngày ấp ${age} — kiểm tra nở và chuẩn bị ghép con`});
+  else if(age>18)items.push({level:'red',slot,date:start,text:`Tổ ${slot}: đã qua ${age} ngày ấp, chưa có xác nhận ghép — cần kiểm tra và cập nhật kết quả`});
+ });
+ db.pairings.forEach(p=>{
+  const age=daysBetween(p.date,todayStr);
+  const slots=[...(p.slots||[])].map(x=>String(x).padStart(3,'0')).sort(numericSort);
+  const firstSlot=slots[0]||'999999';
+  if(age>=3&&!p.checkDay3Done)items.push({level:age>5?'red':'yellow',slot:firstSlot,date:p.date,pair:p.id,text:`Đợt ghép ${p.date} (${slots.join(', ')||p.nests+' tổ'}): đến lịch kiểm tra sau ghép ngày 3`});
+  if(age>=5&&!p.checkDay5Done)items.push({level:'red',slot:firstSlot,date:p.date,pair:p.id,text:`Đợt ghép ${p.date} (${slots.join(', ')||p.nests+' tổ'}): đến lịch kiểm tra ưu tiên ngày 5, cần xác nhận kết quả`});
+ });
+ const el=$('breedingAlerts');
+ if(!el)return;
+ items.sort((a,b)=>numericSort(a.slot||'999999',b.slot||'999999')||
+  ((a.level==='red'?0:1)-(b.level==='red'?0:1))||
+  String(a.date||'').localeCompare(String(b.date||'')));
+ el.innerHTML=items.length
+  ?`<p class="hint"><b>${items.length}</b> nhắc nhở · Mã tổ tăng dần từ nhỏ đến lớn</p>`+
+   items.map(x=>`<div class="notice" style="border-left:4px solid ${x.level==='red'?'#c62828':'#e6a23c'};margin:7px 0"><b>${x.level==='red'?'CẦN XỬ LÝ':'SẮP ĐẾN HẠN'}</b> · ${esc(x.text)}${x.pair?` <button class="secondary" onclick="page('pairing')">Mở ghép con</button>`:''}</div>`).join('')
+  :'<p class="muted">Hiện chưa có lịch nhắc cần xử lý.</p>';
 }
 function forecastHtml(list){return list.length?`<div class="notice">${list.map(p=>`<p><b>${p.date}</b> · ${p.nests} tổ · ${fmt(p.birds)} con · ${p.slots.join(', ')||'Chưa gắn mã ô'}</p>`).join('')}</div>`:'<p class="muted">Chưa có đợt ghép trong khoảng ngày này.</p>'}
 function showInc(d){$('incDay').value=d;$('incSummary').textContent='Đang xem danh sách ô của ngày '+d;let x=db.incubations.find(i=>i.date===d);$('incDayRows').innerHTML=[...(x?.slots||[])].sort(numericSort).map(id=>`<tr><td>${id}</td><td><span class="pill">Đang ấp</span></td><td></td></tr>`).join('');page('overview')}
@@ -604,5 +632,4 @@ async function startFirebase(){
  }catch(e){$('loginPanel').style.display='block';$('mainApp').style.display='none';$('loginMessage').textContent='Không khởi tạo được Firebase: '+friendlyError(e);console.error(e)}
 }
 startFirebase();
-window.addEventListener('online',()=>{if(currentUser&&cloudReady)setSync('Đã có mạng. Các lần lưu tiếp theo sẽ đồng bộ Firebase.')});
-</script></body></html>
+window.addEventListener('online',
