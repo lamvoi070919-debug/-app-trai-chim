@@ -46,7 +46,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;b
  <p class="muted">Đăng nhập để tải và đồng bộ dữ liệu riêng tư trên Firebase.</p>
  <label for="loginEmail">Email đã đăng ký</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Nhập email">
  <label for="loginPassword">Mật khẩu</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu">
- <button id="loginBtn" type="button" style="width:100%" onclick="login()">ĐĂNG NHẬP</button>
+ <button id="loginBtn" type="button" style="width:100%" onclick="login()" disabled>ĐANG KẾT NỐI FIREBASE...</button>
  <p id="loginMessage">Dùng email và mật khẩu đã tạo trong Firebase Authentication.</p>
 </section>
 <div id="mainApp">
@@ -158,7 +158,7 @@ const $=id=>document.getElementById(id), today=()=>{let d=new Date();return d.ge
 const blank=()=>({coops:Array.from({length:1800},(_,i)=>({id:String(i+1).padStart(3,'0'),status:'Trống',parents:'Bình thường'})),incubations:[],incubationDrops:[],raisingProfiles:[],eggPhotoLogs:[],incidents:[],eggs:[],pairings:[],chicks:[],transfers:[],sales:[],expenses:[],manureSales:[],prices:{1:170000,2:150000,3:130000}});
 let db=blank();
 let incPairFilteredDate='';
-let auth=null, authApi=null, firestore=null, currentUser=null, cloudReady=false, cloudRef=null;
+let auth=null, authApi=null, firestore=null, currentUser=null, cloudReady=false, cloudRef=null, firebaseReady=false;
 let saveQueue=Promise.resolve(), localKey='pigeonFarmDB';
 let thaoUnsubscribe=null, thaoLiveData=null;
 const THAO_UID='1ePS2ZPFVpVyErE3L81CzJT6kPb2';
@@ -470,11 +470,12 @@ function friendlyError(e){
 }
 async function login(){
  const email=$('loginEmail').value.trim(),password=$('loginPassword').value,btn=$('loginBtn');
+ if(!firebaseReady||!authApi||!auth){$('loginMessage').textContent='Firebase chưa khởi tạo xong. Vui lòng tải lại trang và đợi nút Đăng nhập sẵn sàng.';return;}
  if(!email||!password){$('loginMessage').textContent='Vui lòng nhập email và mật khẩu.';return;}
  btn.disabled=true;btn.textContent='ĐANG ĐĂNG NHẬP...';$('loginMessage').textContent='Đang kiểm tra tài khoản...';
  try{await authApi.signInWithEmailAndPassword(auth,email,password)}catch(e){$('loginMessage').textContent='Đăng nhập chưa thành công: '+friendlyError(e);btn.disabled=false;btn.textContent='ĐĂNG NHẬP';console.error(e)}
 }
-async function logout(){try{await authApi.signOut(auth)}catch(e){alert('Không đăng xuất được: '+friendlyError(e))}}
+async function logout(){if(!firebaseReady||!authApi||!auth)return;try{await authApi.signOut(auth)}catch(e){alert('Không đăng xuất được: '+friendlyError(e))}}
 function applyThaoData(data){
  // App Thảo lưu dữ liệu trong trường thaoDB; vẫn hỗ trợ tài liệu cũ có mảng ở cấp ngoài.
  const root=data||{}, x=(root.thaoDB&&typeof root.thaoDB==='object')?root.thaoDB:root, arr=k=>Array.isArray(x[k])?x[k]:[];
@@ -535,7 +536,8 @@ async function startFirebase(){
    import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')
   ]);
   const config={apiKey:'AIzaSyAE7M7khd-exDyS9FFIhJOiqTQxtB9inxI',authDomain:'trai-chim-cua-toi.firebaseapp.com',projectId:'trai-chim-cua-toi',storageBucket:'trai-chim-cua-toi.firebasestorage.app',messagingSenderId:'221656058023',appId:'1:221656058023:web:c44894b5a709f6a9863382'};
-  const firebaseApp=appMod.initializeApp(config);auth=authMod.getAuth(firebaseApp);authApi=authMod;firestore=storeMod;
+  const firebaseApp=appMod.initializeApp(config);auth=authMod.getAuth(firebaseApp);authApi=authMod;firestore=storeMod;firebaseReady=true;
+  $('loginBtn').disabled=false;$('loginBtn').textContent='ĐĂNG NHẬP';$('loginMessage').textContent='Firebase đã sẵn sàng. Nhập email và mật khẩu để đăng nhập.';
   authMod.onAuthStateChanged(auth,async user=>{
    currentUser=user;cloudReady=false;
    if(!user){if(thaoUnsubscribe){thaoUnsubscribe();thaoUnsubscribe=null;}$('mainApp').style.display='none';$('loginPanel').style.display='block';$('loginBtn').disabled=false;$('loginBtn').textContent='ĐĂNG NHẬP';return;}
@@ -562,7 +564,7 @@ async function startFirebase(){
     cloudReady=true;render();autoBackupLocal();listenThaoData(database,storeMod);
    }catch(e){cloudReady=false;setSync('Không tải được dữ liệu: '+friendlyError(e));alert('Không tải được dữ liệu Firebase. Ứng dụng tạm khóa đồng bộ để tránh ghi đè dữ liệu cũ. Chi tiết: '+friendlyError(e));}
   });
- }catch(e){$('loginPanel').style.display='block';$('mainApp').style.display='none';$('loginMessage').textContent='Không khởi tạo được Firebase: '+friendlyError(e);console.error(e)}
+ }catch(e){firebaseReady=false;$('loginPanel').style.display='block';$('mainApp').style.display='none';$('loginBtn').disabled=true;$('loginBtn').textContent='FIREBASE CHƯA SẴN SÀNG';$('loginMessage').textContent='Không khởi tạo được Firebase: '+friendlyError(e)+' Hãy kiểm tra kết nối Internet rồi tải lại trang.';console.error(e)}
 }
 startFirebase();
 window.addEventListener('online',()=>{if(currentUser&&cloudReady)setSync('Đã có mạng. Các lần lưu tiếp theo sẽ đồng bộ Firebase.')});
