@@ -672,7 +672,47 @@ function renderHatchDeaths(){const date=pairStatsDateValue($('pairStatsDate')?.v
 function resetHatchDeathForm(){const f=$('hatchDeathForm');f.reset();delete f.dataset.editId;$('hatchDeathDate').value=$('pairStatsDate')?.value||today();$('hatchDeathSaveBtn').textContent='Lưu số chim chết';$('hatchDeathCancelBtn').style.display='none';}
 function editHatchDeath(recordId){const x=(db.hatchDeaths||[]).find(r=>r.id===recordId);if(!x)return;$('hatchDeathDate').value=x.date||today();$('hatchDeathSlot').value=x.slot||'';$('hatchDeathCount').value=x.count||1;$('hatchDeathReason').value=x.reason||'';$('hatchDeathNote').value=x.note||'';$('hatchDeathForm').dataset.editId=recordId;$('hatchDeathSaveBtn').textContent='Lưu thay đổi';$('hatchDeathCancelBtn').style.display='inline-flex';$('hatchDeathForm').scrollIntoView({behavior:'smooth',block:'center'});}
 function deleteHatchDeath(recordId){if(!confirm('Xóa bản ghi chim nở nhưng chết này?'))return;db.hatchDeaths=(db.hatchDeaths||[]).filter(x=>x.id!==recordId);save();renderHatchDeaths();renderPairingStats();}
-function editPairing(pairId){let p=db.pairings.find(x=>x.id===pairId);if(!p)return;if(p._source==='thao'){alert('Bản ghi đồng bộ từ App Thảo chỉ xem được tại đây.');return;}$('pairDate').value=p.date||today();$('pairNests').value=p.nests??(p.slots||[]).length;$('pairBirds').value=p.birds||0;$('pairSlots').value=(p.slots||[]).join(',');$('pairSlotCounts').value=Object.entries(p.slotBirdCounts||p.birdsBySlot||{}).map(([k,v])=>`${k}:${v}`).join(', ');$('pairNote').value=p.note||'';$('pairForm').dataset.editId=pairId;$('pairForm').querySelector('button[type=submit]').textContent='Lưu thay đổi';page('pairing');$('pairForm').scrollIntoView({behavior:'smooth'});}
+function editPairing(pairId){
+ const p=(db.pairings||[]).find(x=>x.id===pairId);if(!p)return;
+ if(p._source==='thao'){alert('Bản ghi đồng bộ từ App Thảo chỉ xem được tại đây.');return;}
+ const panel=$('pairStatsDetail');if(!panel)return;
+ const kind=panel.dataset.kind||'birds';panel.dataset.editingPairId=pairId;
+ panel.innerHTML=`<div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">✏️ Sửa lượt ghép · ${esc(p.date||'')}</h3><button type="button" class="secondary miniAction" onclick="cancelInlinePairingEdit()">Hủy sửa</button></div>
+ <div class="fields" style="margin-top:12px">
+ <div><label>Ngày ghép</label><input type="date" id="inlinePairDate" value="${esc(p.date||today())}"></div>
+ <div><label>Số tổ</label><input type="number" min="0" id="inlinePairNests" value="${Number(p.nests??(p.slots||[]).length)||0}"></div>
+ <div><label>Số chim ghép</label><input type="number" min="0" id="inlinePairBirds" value="${Number(p.birds)||0}"></div>
+ <div><label>Mã tổ (cách nhau bằng dấu phẩy)</label><input id="inlinePairSlots" value="${esc((p.slots||[]).join(','))}" placeholder="001,002"></div>
+ <div><label>Số con theo từng tổ</label><input id="inlinePairSlotCounts" value="${esc(Object.entries(p.slotBirdCounts||p.birdsBySlot||{}).map(([k,v])=>`${k}:${v}`).join(', '))}" placeholder="001:2, 002:1"></div>
+ <div><label>Ghi chú</label><input id="inlinePairNote" value="${esc(p.note||'')}"></div>
+ </div><p class="hint">Chỉnh ngay tại đây, không cần quay lại mục nhập ghép con. Các thông tin theo dõi khác của lượt ghép được giữ nguyên.</p>
+ <div class="actions"><button type="button" onclick="saveInlinePairingEdit('${p.id}')">💾 Lưu thay đổi</button><button type="button" class="secondary" onclick="cancelInlinePairingEdit()">Hủy</button></div>`;
+ panel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function cancelInlinePairingEdit(){
+ const panel=$('pairStatsDetail');if(!panel)return;
+ delete panel.dataset.editingPairId;
+ showPairingStatDetail(panel.dataset.kind||'birds');
+}
+function saveInlinePairingEdit(pairId){
+ const p=(db.pairings||[]).find(x=>x.id===pairId);if(!p)return;
+ if(p._source==='thao'){alert('Bản ghi đồng bộ từ App Thảo chỉ xem được tại đây.');return;}
+ const date=$('inlinePairDate')?.value||'',nests=Number($('inlinePairNests')?.value),birds=Number($('inlinePairBirds')?.value);
+ const slots=parseList($('inlinePairSlots')?.value||'').map(x=>String(x).padStart(3,'0'));
+ if(!date||!Number.isFinite(nests)||nests<0||!Number.isFinite(birds)||birds<0){alert('Vui lòng kiểm tra ngày, số tổ và số chim.');return;}
+ if(slots.some(x=>!/^\d{3,4}$/.test(x))){alert('Mã tổ không hợp lệ.');return;}
+ const slotBirdCounts={};const raw=$('inlinePairSlotCounts')?.value.trim()||'';
+ if(raw){
+  raw.split(/[,;]+/).forEach(part=>{const m=part.trim().match(/^(\d+)\\s*[:：=]\\s*(\d+)$/);if(m)slotBirdCounts[String(m[1]).padStart(3,'0')]=Number(m[2]);});
+  const sum=Object.values(slotBirdCounts).reduce((a,b)=>a+b,0);
+  if(slots.some(x=>!Object.prototype.hasOwnProperty.call(slotBirdCounts,x))||Object.keys(slotBirdCounts).some(x=>!slots.includes(x))||sum!==birds){alert('Số con theo từng tổ phải có đủ mọi mã tổ và tổng phải bằng số chim ghép.');return;}
+ }else if(slots.length===1){slotBirdCounts[slots[0]]=birds;}
+ Object.assign(p,{date,nests,birds,slots,note:$('inlinePairNote')?.value.trim()||''});
+ if(Object.keys(slotBirdCounts).length)p.slotBirdCounts=slotBirdCounts;else delete p.slotBirdCounts;
+ const panel=$('pairStatsDetail');if(panel)delete panel.dataset.editingPairId;
+ $('pairStatsDate').value=date;save();renderPairingStats();
+ alert('Đã lưu thay đổi lượt ghép.');
+}
 function markPairCheck(pairId,day){let p=db.pairings.find(x=>x.id===pairId);if(!p)return;p['checkDay'+day+'Done']=true;p['checkDay'+day+'Date']=today();save()}
 function issueTypeName(type){return ({wet:'Đi ỉa ướt',parentNeck:'Bố mẹ bị nghẹo cổ',feather:'Bố mẹ mổ lông chim con',neck:'Chim con nghẹo cổ',weak:'Chim con yếu / chậm lớn',feeding:'Bố mẹ bỏ bón / không đút',other:'Vấn đề khác'})[type]||type||'Vấn đề khác'}
 function issueStatusName(status){return status==='done'?'Đã khắc phục':status==='monitor'?'Đang theo dõi':'Chưa xử lý'}
