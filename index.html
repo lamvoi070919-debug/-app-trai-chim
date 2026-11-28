@@ -894,19 +894,32 @@ function saleBatchRows(){
    rows.push({pairId:p.id,date:String(p.date||''),slot:String(slot).padStart(3,'0'),expected,sold:0,remaining:expected,age:daysBetween(p.date,today())+1,pair:p});
   });
  });
- // Fallback: ô đang nuôi con nhưng không có ngày ghép chuẩn (hoặc ngày nhập hiện trạng mới hơn lượt ghép cũ) dùng ngày nhập tay tại Quản lý ô.
+ // Fallback hiện trạng: nếu Quản lý ô đã chọn rõ "25–30 ngày (xuất bán)"
+ // thì đưa ô vào danh sách khi chưa có phân bổ ghép chuẩn cho chính mã ô.
+ // Không yêu cầu ngày ghép/ngày nhập tay; không tạo ngày giả.
  (db.coops||[]).forEach(c=>{
   const slot=String(c.id||'').padStart(3,'0');
-  if(!slot||!['Đang nuôi con','Ấp và nuôi con'].includes(c.status))return;
-  const manualDate=String(c.manualChickStartDate||'').slice(0,10);
-  const manualAgeText=String(c.chickAge||'');
-  const hasManual25to30=/25\s*[–-]\s*30/.test(manualAgeText)&&c.chickAgeManual===true;
-  if(!manualDate&&!hasManual25to30)return;
-  const latest=(db.pairings||[]).filter(p=>(p.slots||[]).some(v=>String(v).padStart(3,'0')===slot)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))[0];
-  if(latest&&(!manualDate||String(latest.date||'')>=manualDate))return;
+  if(!slot)return;
+  const manualAgeText=String(c.chickAge||'').trim();
+  const markedForSale=/25\\s*[–-]\\s*30/.test(manualAgeText)&&/xuất\\s*bán/i.test(manualAgeText);
+  if(!markedForSale)return;
   const expected=Math.max(0,Number(c.chickCount)||0);if(!expected)return;
-  const manualAge=manualDate?daysBetween(manualDate,today())+1:27;
-  rows.push({pairId:'manual:'+slot+':'+(manualDate||'age-entry'),date:manualDate,slot,expected,sold:0,remaining:expected,age:manualAge,pair:null,source:manualDate?'Ngày nhập tay tại Quản lý ô':'Tuổi 25–30 ngày do nhập tay tại Quản lý ô',manualAgeOnly:!manualDate});
+  // Nếu đã có số chim phân bổ từ lịch sử ghép ở mã ô này, giữ nguyên
+  // dòng lịch sử ghép và cách tính tuổi theo ngày ghép; tránh tạo dòng trùng.
+  const hasPairAllocation=rows.some(x=>x.slot===slot&&x.expected>0);
+  if(hasPairAllocation)return;
+  rows.push({
+   pairId:'manual:'+slot+':age-entry',
+   date:'',
+   slot,
+   expected,
+   sold:0,
+   remaining:expected,
+   age:27,
+   pair:null,
+   source:'Hiện trạng Quản lý ô · chọn 25–30 ngày (xuất bán)',
+   manualAgeOnly:true
+  });
  });
  rows.sort((a,b)=>String(a.date).localeCompare(String(b.date))||numericSort(a.slot,b.slot));
  const byId=new Map(rows.map(x=>[String(x.pairId)+'|'+x.slot,x]));
