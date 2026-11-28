@@ -898,11 +898,15 @@ function saleBatchRows(){
  (db.coops||[]).forEach(c=>{
   const slot=String(c.id||'').padStart(3,'0');
   if(!slot||!['Đang nuôi con','Ấp và nuôi con'].includes(c.status))return;
-  const manualDate=String(c.manualChickStartDate||'').slice(0,10);if(!manualDate)return;
+  const manualDate=String(c.manualChickStartDate||'').slice(0,10);
+  const manualAgeText=String(c.chickAge||'');
+  const hasManual25to30=/25\s*[–-]\s*30/.test(manualAgeText)&&c.chickAgeManual===true;
+  if(!manualDate&&!hasManual25to30)return;
   const latest=(db.pairings||[]).filter(p=>(p.slots||[]).some(v=>String(v).padStart(3,'0')===slot)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))[0];
-  if(latest&&String(latest.date||'')>=manualDate)return;
+  if(latest&&(!manualDate||String(latest.date||'')>=manualDate))return;
   const expected=Math.max(0,Number(c.chickCount)||0);if(!expected)return;
-  rows.push({pairId:'manual:'+slot+':'+manualDate,date:manualDate,slot,expected,sold:0,remaining:expected,age:daysBetween(manualDate,today())+1,pair:null,source:'Ngày nhập tay tại Quản lý ô'});
+  const manualAge=manualDate?daysBetween(manualDate,today())+1:27;
+  rows.push({pairId:'manual:'+slot+':'+(manualDate||'age-entry'),date:manualDate,slot,expected,sold:0,remaining:expected,age:manualAge,pair:null,source:manualDate?'Ngày nhập tay tại Quản lý ô':'Tuổi 25–30 ngày do nhập tay tại Quản lý ô',manualAgeOnly:!manualDate});
  });
  rows.sort((a,b)=>String(a.date).localeCompare(String(b.date))||numericSort(a.slot,b.slot));
  const byId=new Map(rows.map(x=>[String(x.pairId)+'|'+x.slot,x]));
@@ -925,11 +929,12 @@ function saleWeekStage(){const d=new Date(today()+'T12:00:00'),day=d.getDay();if
 function renderSaleBatches(){
  const body=$('saleBatchRows');if(!body)return;
  const all=saleBatchRows(),weekday=new Date(today()+'T12:00:00').getDay(),closed=[0,4,5,6].includes(weekday),monday=nextSaleMonday(),fridayPlan=weekday===5||weekday===6||weekday===0;
- const shown=fridayPlan?all.filter(x=>{const ageMonday=daysBetween(x.date,monday)+1;return (ageMonday>=25&&ageMonday<=30)||(ageMonday>30&&x.remaining>0)}):all.filter(x=>(x.age>=25&&x.age<=30)||(x.age>30&&x.remaining>0));
+ const plannedAge=x=>x.manualAgeOnly?27:daysBetween(x.date,monday)+1;
+ const shown=fridayPlan?all.filter(x=>{const ageMonday=plannedAge(x);return (ageMonday>=25&&ageMonday<=30)||(ageMonday>30&&x.remaining>0)}):all.filter(x=>(x.manualAgeOnly||(x.age>=25&&x.age<=30)||(x.age>30&&x.remaining>0)));
  const active=shown.filter(x=>!closed),archived=shown.filter(x=>closed);
  $('saleBatchStage').textContent=saleWeekStage()+(fridayPlan?' · Tuổi được tính tại ngày bán dự kiến '+monday+'.':'')+' · '+(closed?'Danh sách đang hiển thị ở chế độ theo dõi/lịch sử.':'Danh sách đang hoạt động.');
  $('saleBatchTotals').innerHTML=[['Số ô trong danh sách',shown.length],['Tổng chim dự kiến',shown.reduce((n,x)=>n+x.expected,0)],['Đã bán thực tế',shown.reduce((n,x)=>n+x.sold,0)],['Còn lại',shown.reduce((n,x)=>n+x.remaining,0)]].map(x=>`<div class="card kpi"><label>${x[0]}</label><b style="font-size:20px">${fmt(x[1])}</b></div>`).join('');
- body.innerHTML=shown.map(x=>{const ageShown=fridayPlan?daysBetween(x.date,monday)+1:x.age,state=fridayPlan?(x.remaining===0?'Đã bán hết':'Dự kiến bán thứ Hai '+monday):closed?'Theo dõi · Lịch sử':x.remaining===0?'Đã bán hết':weekday===1?'Chờ chốt danh sách':weekday===2?'Cần kiểm tra còn lại':weekday===3?'Đang theo dõi':'Đang hoạt động';const action=x.remaining>0?`<button type="button" class="secondary miniAction" onclick="setCoopWaitingAfterSale('${x.slot}')">Chuyển ô sang Chờ đẻ</button>`:'—';return `<tr><td>${esc(x.date)}${x.source?`<div class="hint">${esc(x.source)}</div>`:''}</td><td><b>${esc(x.slot)}</b></td><td>${fmt(ageShown)} ngày${x.source?' (ngày nhập tay)':''}${fridayPlan?'<div class="hint">Tuổi dự kiến vào thứ Hai</div>':''}</td><td>${fmt(x.expected)}</td><td>${fmt(x.sold)}</td><td><b>${fmt(x.remaining)}</b></td><td>${esc(state)}<div class="actions">${action}</div></td></tr>`}).join('')||'<tr><td colspan="7">Chưa có ô trong độ tuổi xuất bán 25–30 ngày hoặc còn số chim chưa bán từ đợt trước.</td></tr>';
+ body.innerHTML=shown.map(x=>{const ageShown=fridayPlan?plannedAge(x):x.age,state=fridayPlan?(x.remaining===0?'Đã bán hết':'Dự kiến bán thứ Hai '+monday):closed?'Theo dõi · Lịch sử':x.remaining===0?'Đã bán hết':weekday===1?'Chờ chốt danh sách':weekday===2?'Cần kiểm tra còn lại':weekday===3?'Đang theo dõi':'Đang hoạt động';const action=x.remaining>0?`<button type="button" class="secondary miniAction" onclick="setCoopWaitingAfterSale('${x.slot}')">Chuyển ô sang Chờ đẻ</button>`:'—';const ageLabel=x.manualAgeOnly?'25–30 ngày (nhập tay)':fmt(ageShown)+' ngày';return `<tr><td>${esc(x.date||'Chưa có ngày ghép chuẩn')}${x.source?`<div class="hint">${esc(x.source)}</div>`:''}</td><td><b>${esc(x.slot)}</b></td><td>${ageLabel}${fridayPlan?'<div class="hint">Danh sách chuẩn bị bán thứ Hai</div>':''}</td><td>${fmt(x.expected)}</td><td>${fmt(x.sold)}</td><td><b>${fmt(x.remaining)}</b></td><td>${esc(state)}<div class="actions">${action}</div></td></tr>`}).join('')||'<tr><td colspan="7">Chưa có ô trong độ tuổi xuất bán 25–30 ngày hoặc còn số chim chưa bán từ đợt trước.</td></tr>';
  const select=$('salePairId'),current=select?.value;if(select){select.innerHTML='<option value="">Không liên kết đợt ghép</option>'+all.filter(x=>x.remaining>0).map(x=>`<option value="${esc(String(x.pairId))}|${esc(x.slot)}">${esc(x.date)} · Ô ${esc(x.slot)}${x.source?' · nhập tay':''} · còn ${fmt(x.remaining)} con</option>`).join('');if(current&&Array.from(select.options).some(o=>o.value===current))select.value=current;}
 }
 function setCoopWaitingAfterSale(slot){const c=(db.coops||[]).find(x=>String(x.id).padStart(3,'0')===String(slot).padStart(3,'0'));if(!c)return alert('Không tìm thấy mã ô '+slot+'.');c.status='Chờ đẻ';c.statusManual=true;c.operationalNote=[c.operationalNote,'Đã chuyển sang Chờ đẻ sau khi kiểm tra đợt bán; lịch sử ghép và bán được giữ nguyên.'].filter(Boolean).join(' · ');save();alert('Đã chuyển ô '+slot+' sang Chờ đẻ. Lịch sử ghép và bán vẫn được giữ nguyên.');}
